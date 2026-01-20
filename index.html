@@ -561,6 +561,25 @@
             background: #f5f3ff;
             color: #5b21b6;
         }
+
+        .guide-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.85rem;
+            color: var(--primary);
+            text-decoration: none;
+            margin-top: 0.5rem;
+            padding: 4px 8px;
+            background: var(--primary-light);
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .guide-link:hover {
+            background: var(--primary);
+            color: white;
+        }
     </style>
 </head>
 
@@ -656,9 +675,15 @@
                 </div>
             </div>
 
-            <!-- Other Requirements -->
+            <!-- Other Requirements divided into Chapters -->
             <div style="margin-bottom: 2.5rem;">
-                <h3><i data-lucide="check-circle" style="vertical-align: middle;"></i> 기타 졸업 요건</h3>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap;">
+                    <h3><i data-lucide="users" style="vertical-align: middle;"></i> 챕터 1: 성인지교육</h3>
+                    <a href="https://egc.cnu.ac.kr/egc/board/notice.do?mode=view&articleNo=288590&article.offset=0&articleLimit=15&srSearchVal=%EC%84%B1%EC%9D%B8%EC%A7%80%EA%B5%90%EC%9C%A1"
+                        target="_blank" class="guide-link">
+                        <i data-lucide="external-link" style="width: 14px; height: 14px;"></i> 이수방법 안내
+                    </a>
+                </div>
                 <div class="grid-list">
                     <label class="checkbox-container">성인지교육 1차 이수
                         <input type="checkbox" id="check-gender1"><span class="checkmark"></span>
@@ -666,19 +691,49 @@
                     <label class="checkbox-container">성인지교육 2차 이수
                         <input type="checkbox" id="check-gender2"><span class="checkmark"></span>
                     </label>
-                    <label class="checkbox-container">연구윤리 이수
+                </div>
+            </div>
+
+            <div style="margin-bottom: 2.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap;">
+                    <h3><i data-lucide="shield-check" style="vertical-align: middle;"></i> 챕터 2: 연구윤리</h3>
+                    <a href="https://egc.cnu.ac.kr/egc/board/notice.do?mode=view&articleNo=538237&article.offset=0&articleLimit=15&srSearchVal=%EC%97%B0%EA%B5%AC%EC%9C%A4%EB%A6%AC"
+                        target="_blank" class="guide-link">
+                        <i data-lucide="external-link" style="width: 14px; height: 14px;"></i> 이수방법 안내
+                    </a>
+                </div>
+                <div class="grid-list">
+                    <label class="checkbox-container">연구윤리 교육 이수
                         <input type="checkbox" id="check-ethics"><span class="checkmark"></span>
                     </label>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 2.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap;">
+                    <h3><i data-lucide="heart-pulse" style="vertical-align: middle;"></i> 챕터 3: 심폐소생술</h3>
+                    <a href="https://egc.cnu.ac.kr/egc/board/notice.do?mode=view&articleNo=569225&article.offset=0&articleLimit=15&srSearchVal=%EC%8B%AC%ED%8F%90%EC%86%8C%EC%83%9D"
+                        target="_blank" class="guide-link">
+                        <i data-lucide="external-link" style="width: 14px; height: 14px;"></i> 제출방법 안내
+                    </a>
+                </div>
+                <div class="grid-list">
                     <label class="checkbox-container">심폐소생술 1회 (서로 다른 년도)
                         <input type="checkbox" id="check-cpr1"><span class="checkmark"></span>
                     </label>
                     <label class="checkbox-container">심폐소생술 2회 (서로 다른 년도)
                         <input type="checkbox" id="check-cpr2"><span class="checkmark"></span>
                     </label>
-                    <label class="checkbox-container">인적성검사 1회 적격
+                </div>
+            </div>
+
+            <div style="margin-bottom: 2.5rem;">
+                <h3><i data-lucide="clipboard-check" style="vertical-align: middle;"></i> 챕터 4: 인적성검사</h3>
+                <div class="grid-list">
+                    <label class="checkbox-container">교직 적성 및 인성 검사 1회 적격
                         <input type="checkbox" id="check-apt1"><span class="checkmark"></span>
                     </label>
-                    <label class="checkbox-container">인적성검사 2회 적격
+                    <label class="checkbox-container">교직 적성 및 인성 검사 2회 적격
                         <input type="checkbox" id="check-apt2"><span class="checkmark"></span>
                     </label>
                 </div>
@@ -1088,20 +1143,33 @@
         function calculateResult() {
             const trackInfo = CONFIG.tracks[state.track];
             const courses = Array.from(document.querySelectorAll('.course-input')).map(sel => sel.value).filter(v => v);
-
-            // 1. Credit Check
-            let totalMajor = 0;
-            let totalEdu = 0;
             let uniqueCourses = new Set();
             let hasDuplicate = false;
-
             courses.forEach(c => {
                 if (uniqueCourses.has(c)) hasDuplicate = true;
                 uniqueCourses.add(c);
-                if (CONFIG.major_subjects.includes(c)) totalMajor += 2;
-                else if (CONFIG.edu_subjects.includes(c)) totalEdu += 2;
             });
 
+            // 1. Credit Check per category
+            let credits = {
+                basic: 0,
+                essential: 0,
+                major: 0,
+                edu: 0
+            };
+
+            const basicSet = new Set(CONFIG.basic_areas);
+            const essentialSet = new Set(CONFIG.essentials);
+
+            uniqueCourses.forEach(c => {
+                if (basicSet.has(c)) credits.basic += 2;
+                else if (essentialSet.has(c)) credits.essential += 2;
+                else if (CONFIG.major_subjects.includes(c)) credits.major += 2;
+                else if (CONFIG.edu_subjects.includes(c)) credits.edu += 2;
+            });
+
+            const totalMajor = credits.basic + credits.essential + credits.major;
+            const totalEdu = credits.edu;
             const totalCredits = totalMajor + totalEdu;
 
             // 2. Areas Check
@@ -1143,11 +1211,6 @@
             document.getElementById('req-credits').innerText = trackInfo.total;
             document.getElementById('curr-credits').innerText = totalCredits;
 
-            const areaCount = satisfiedAreas.size + (satisfiedEssentials.length > 0 ? (satisfiedEssentials.includes('기술과 교육과정 및 교재연구') ? 1 : 0) + (satisfiedEssentials.includes('기술과 논술') ? 1 : 0) : 0);
-            // Simplified area metric: 6 areas + 3 essentials = 9 components. 
-            // Note: 기술교육론 is both Area 1 and Essential 1. So total unique components are 6 Areas + 2 Essentials = 8 components. 
-            // Let's just list them clearly.
-
             const creditPass = totalCredits >= trackInfo.total && totalMajor >= trackInfo.major && totalEdu >= trackInfo.edu && !hasDuplicate;
             const areasPass = satisfiedAreas.size === 6 && CONFIG.essentials.every(e => uniqueCourses.has(e));
             const extraPass = Object.values(checks).every(v => v) && paperDone;
@@ -1160,6 +1223,47 @@
             areaStatus.className = 'status-pill ' + (areasPass ? 'status-pass' : 'status-fail');
             areaStatus.innerText = areasPass ? '전부 충족' : '일부 미비';
             document.getElementById('curr-areas').innerText = satisfiedAreas.size;
+
+            // Generate detailed missing info
+            let missingInfo = [];
+
+            // 1. Basic Areas & Credits
+            const missingAreas = CONFIG.areas.filter(a => !satisfiedAreas.has(a.id));
+            if (missingAreas.length > 0) {
+                missingAreas.forEach(a => {
+                    missingInfo.push(`기본이수교과 [${a.name}] 영역 미이수`);
+                });
+                missingInfo.push(`기본이수교과 ${missingAreas.length * 2}학점 미이수`);
+            }
+
+            // 2. Essentials (Subject Education)
+            CONFIG.essentials.forEach(e => {
+                if (!uniqueCourses.has(e)) {
+                    missingInfo.push(`교과교육 [${e}] 2학점 미이수`);
+                }
+            });
+
+            // 3. Teaching Profession
+            if (totalEdu < trackInfo.edu) {
+                missingInfo.push(`교직 ${trackInfo.edu - totalEdu}학점 미이수`);
+            }
+
+            // 4. Major Credits (General)
+            if (totalMajor < trackInfo.major) {
+                missingInfo.push(`일반전공 ${trackInfo.major - totalMajor}학점 미이수`);
+            }
+
+            if (hasDuplicate) {
+                missingInfo.push('중복된 수강 과목이 존재합니다');
+            }
+
+            // 5. Extra requirements
+            if (!checks.gender) missingInfo.push('성인지교육 미완료 (1, 2차 필요)');
+            if (!checks.ethics) missingInfo.push('연구윤리 교육 미이수');
+            if (!checks.cpr) missingInfo.push('심폐소생술 미완료 (2회 필요)');
+            if (!checks.apt) missingInfo.push('교직 인적성검사 미완료 (2회 필요)');
+            if (!checks.exam) missingInfo.push('종합시험 미통과');
+            if (!paperDone) missingInfo.push(`${trackInfo.type === 'thesis' ? '학위논문' : '연구보고서'} 행정절차 미완료`);
 
             const detailDiv = document.getElementById('detailed-checks');
             detailDiv.innerHTML = `
@@ -1185,8 +1289,16 @@
                 <div>성인지교육 (1, 2차 완료)</div>
             </div>
             <div class="check-item">
+                <i data-lucide="${checks.ethics ? 'check-circle' : 'x-circle'}" class="check-icon ${checks.ethics ? 'pass' : 'fail'}"></i>
+                <div>연구윤리 (이수 완료)</div>
+            </div>
+            <div class="check-item">
                 <i data-lucide="${checks.cpr ? 'check-circle' : 'x-circle'}" class="check-icon ${checks.cpr ? 'pass' : 'fail'}"></i>
                 <div>심폐소생술 (2회 완료 - 연도별)</div>
+            </div>
+            <div class="check-item">
+                <i data-lucide="${checks.apt ? 'check-circle' : 'x-circle'}" class="check-icon ${checks.apt ? 'pass' : 'fail'}"></i>
+                <div>교직 인적성검사 (2회 적격)</div>
             </div>
             <div class="check-item">
                 <i data-lucide="${checks.exam ? 'check-circle' : 'x-circle'}" class="check-icon ${checks.exam ? 'pass' : 'fail'}"></i>
@@ -1204,7 +1316,13 @@
                 finalStatus.className = 'grad-possible';
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
             } else {
-                finalStatus.innerText = '졸업 요건 미충족 (상세 항목을 확인하세요)';
+                let statusHtml = '<div style="margin-bottom: 10px;">졸업 요건 미충족</div>';
+                statusHtml += '<ul style="font-size: 0.9rem; text-align: left; display: inline-block; margin-top: 10px; color: #9f1239;">';
+                missingInfo.forEach(info => {
+                    statusHtml += `<li>${info}</li>`;
+                });
+                statusHtml += '</ul>';
+                finalStatus.innerHTML = statusHtml;
                 finalStatus.className = 'grad-impossible';
             }
 
