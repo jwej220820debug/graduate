@@ -7,7 +7,8 @@
     <title>충남대학교 교육대학원 기술교육전공 졸업사정 시스템</title>
     <meta name="description" content="충남대학교 교육대학원 기술교육전공 학생들을 위한 자가 졸업 사정 및 요건 체크 시스템입니다.">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
         rel="stylesheet">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -15,37 +16,77 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
-            --primary: #004b99;
-            --primary-light: #e6f0ff;
+            --primary: #2563eb;
+            --primary-700: #1d4ed8;
+            --primary-light: #eff6ff;
             --secondary: #64748b;
             --accent: #f59e0b;
             --success: #10b981;
             --danger: #ef4444;
             --bg: #f8fafc;
-            --card-bg: rgba(255, 255, 255, 0.8);
-            --text-main: #1e293b;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --text-main: #0f172a;
             --text-muted: #64748b;
             --border: #e2e8f0;
-            --radius: 16px;
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            --radius: 20px;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Noto Sans KR', sans-serif;
+            font-family: 'Inter', 'Noto Sans KR', sans-serif;
         }
 
         body {
             background: var(--bg);
-            background-image:
-                radial-gradient(at 0% 0%, rgba(0, 75, 153, 0.05) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(245, 158, 11, 0.05) 0px, transparent 50%);
             color: var(--text-main);
             line-height: 1.6;
             min-height: 100vh;
             padding: 2rem 1rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated Blobs Background */
+        body::before,
+        body::after {
+            content: "";
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            z-index: -1;
+            filter: blur(100px);
+            opacity: 0.2;
+            pointer-events: none;
+        }
+
+        body::before {
+            background: var(--primary);
+            top: -100px;
+            right: -100px;
+            animation: blobFloat 20s infinite alternate;
+        }
+
+        body::after {
+            background: var(--accent);
+            bottom: -100px;
+            left: -100px;
+            animation: blobFloat 25s infinite alternate-reverse;
+        }
+
+        @keyframes blobFloat {
+            from {
+                transform: translate(0, 0) scale(1);
+            }
+
+            to {
+                transform: translate(40px, 40px) scale(1.1);
+            }
         }
 
         .container {
@@ -80,78 +121,128 @@
         }
 
         h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--primary);
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.25rem;
+            font-weight: 800;
+            color: var(--text-main);
             margin-bottom: 0.5rem;
-            letter-spacing: -0.5px;
+            letter-spacing: -1px;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         p.subtitle {
             color: var(--text-muted);
             font-size: 1.1rem;
+            font-weight: 500;
         }
 
         /* Glass Cards */
         .card {
             background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
             border-radius: var(--radius);
             padding: 2.5rem;
-            box-shadow: var(--shadow);
+            box-shadow: var(--shadow-lg);
             margin-bottom: 2rem;
-            transition: transform 0.3s ease;
+            animation: cardFadeIn 0.5s ease-out;
+        }
+
+        @keyframes cardFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Steps Progress */
         .steps {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 3rem;
-            padding: 0 1rem;
+            margin: 0 auto 4rem;
+            max-width: 600px;
             position: relative;
         }
 
         .steps::before {
             content: '';
             position: absolute;
-            top: 50%;
+            top: 20px;
             left: 0;
             right: 0;
             height: 2px;
             background: var(--border);
             z-index: 0;
-            transform: translateY(-50%);
+        }
+
+        .step-label {
+            position: absolute;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: color 0.3s;
+        }
+
+        .step-container {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .step {
-            z-index: 1;
-            background: var(--bg);
+            background: white;
             width: 40px;
             height: 40px;
-            border-radius: 50%;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 700;
+            font-weight: 800;
             border: 2px solid var(--border);
             color: var(--text-muted);
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        .step.active {
+        .step-container.active .step {
             border-color: var(--primary);
             background: var(--primary);
             color: white;
-            box-shadow: 0 0 15px rgba(0, 75, 153, 0.3);
+            box-shadow: 0 8px 16px rgba(37, 99, 235, 0.2);
+            transform: scale(1.1);
         }
 
-        .step.done {
+        .step-container.active .step-label {
+            color: var(--primary);
+        }
+
+        .step-container.done .step {
             border-color: var(--primary);
             color: var(--primary);
             background: white;
+        }
+
+        .step-container.done .step::after {
+            content: '✓';
+            font-size: 1.2rem;
+        }
+
+        .step-container.done .step span {
+            display: none;
         }
 
         /* Forms */
@@ -192,25 +283,34 @@
         }
 
         .radio-box {
-            border: 1px solid var(--border);
-            padding: 1rem;
-            border-radius: 12px;
+            border: 2px solid var(--border);
+            padding: 1.5rem;
+            border-radius: var(--radius);
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s;
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 1.25rem;
+            background: white;
         }
 
         .radio-box:hover {
             border-color: var(--primary);
-            background: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
         }
 
         .radio-box.selected {
             border-color: var(--primary);
             background: var(--primary-light);
-            box-shadow: inset 0 0 0 1px var(--primary);
+            box-shadow: 0 0 0 1px var(--primary);
+        }
+
+        .radio-box i {
+            background: var(--primary-light);
+            padding: 10px;
+            border-radius: 12px;
+            color: var(--primary);
         }
 
         /* Buttons */
@@ -598,10 +698,46 @@
             align-items: center;
             cursor: pointer;
             background: #fff;
+            transition: background 0.2s;
         }
 
         .requirement-header:hover {
-            background: #f8fafc;
+            background: var(--primary-light);
+        }
+
+        .total-progress-badge {
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 6px solid var(--primary);
+            animation: slideInLeft 0.5s ease-out;
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .credit-text-blue {
+            color: var(--primary);
+            font-weight: 800;
+        }
+
+        .credit-text-red {
+            color: var(--danger);
+            font-weight: 800;
         }
 
         .requirement-title {
@@ -746,9 +882,18 @@
         </header>
 
         <div class="steps">
-            <div class="step active" id="step-dot-1">1</div>
-            <div class="step" id="step-dot-2">2</div>
-            <div class="step" id="step-dot-3">3</div>
+            <div class="step-container active" id="step-cont-1">
+                <div class="step" id="step-dot-1"><span>1</span></div>
+                <div class="step-label">정보 입력</div>
+            </div>
+            <div class="step-container" id="step-cont-2">
+                <div class="step" id="step-dot-2"><span>2</span></div>
+                <div class="step-label">이수 현황</div>
+            </div>
+            <div class="step-container" id="step-cont-3">
+                <div class="step" id="step-dot-3"><span>3</span></div>
+                <div class="step-label">사정 결과</div>
+            </div>
         </div>
 
         <!-- Step 1: Profile & Track Selection -->
@@ -765,17 +910,9 @@
                 <input type="text" id="student-name" placeholder="이름을 입력하세요">
             </div>
             <div class="form-group">
-                <label>입학 전형 및 과정 선택</label>
+                <label>과정 선택</label>
                 <div class="radio-group">
                     <div class="radio-box" onclick="selectTrack('yangseong_report')">
-                        <i data-lucide="book-open"></i>
-                        <div>
-                            <strong>양성 과정 (무논문 연구보고서)</strong>
-                            <div style="font-size: 0.85rem; color: var(--text-muted);">30학점(전공 24, 교직 6), 5학기, 연구보고서
-                            </div>
-                        </div>
-                    </div>
-                    <div class="radio-box" onclick="selectTrack('yangseong_thesis')">
                         <i data-lucide="graduation-cap"></i>
                         <div>
                             <strong>양성 과정 (학위논문)</strong>
@@ -1050,12 +1187,12 @@
             }
 
             document.getElementById(`step-${state.currentStep}`).classList.add('hidden');
-            document.getElementById(`step-dot-${state.currentStep}`).classList.remove('active');
-            if (state.currentStep < step) document.getElementById(`step-dot-${state.currentStep}`).classList.add('done');
+            document.getElementById(`step-cont-${state.currentStep}`).classList.remove('active');
+            if (state.currentStep < step) document.getElementById(`step-cont-${state.currentStep}`).classList.add('done');
 
             state.currentStep = step;
             document.getElementById(`step-${step}`).classList.remove('hidden');
-            document.getElementById(`step-dot-${step}`).classList.add('active');
+            document.getElementById(`step-cont-${step}`).classList.add('active');
             window.scrollTo(0, 0);
         }
 
@@ -1145,17 +1282,30 @@
         }
 
         function updateSemesterCredits() {
+            const trackInfo = CONFIG.tracks[state.track];
             const inputs = document.querySelectorAll('.course-input');
             const totals = {};
+            let grandTotal = 0;
             inputs.forEach(input => {
                 const sem = input.getAttribute('data-sem');
                 if (!totals[sem]) totals[sem] = 0;
-                if (input.value.trim()) totals[sem] += 2;
+                if (input.value.trim()) {
+                    totals[sem] += 2;
+                    grandTotal += 2;
+                }
             });
 
             for (let sem in totals) {
                 const el = document.getElementById(`sem-total-${sem}`);
                 if (el) el.querySelector('span').innerText = totals[sem];
+            }
+
+            // Update Grand Total in Step 2
+            const target = trackInfo ? trackInfo.total : 30;
+            const statusEl = document.getElementById('total-credit-status-text');
+            if (statusEl) {
+                const currentClass = grandTotal >= target ? 'credit-text-blue' : 'credit-text-red';
+                statusEl.innerHTML = `<span class="${currentClass}">${grandTotal}</span> / <span class="credit-text-blue">${target}</span> 학점`;
             }
         }
 
