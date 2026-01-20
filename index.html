@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>충남대학교 교육대학원 기술교육전공 졸업사정 시스템</title>
     <meta name="description" content="충남대학교 교육대학원 기술교육전공 학생들을 위한 자가 졸업 사정 및 요건 체크 시스템입니다.">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- Canvas Confetti -->
@@ -37,7 +39,7 @@
 
         body {
             background: var(--bg);
-            background-image: 
+            background-image:
                 radial-gradient(at 0% 0%, rgba(0, 75, 153, 0.05) 0px, transparent 50%),
                 radial-gradient(at 100% 100%, rgba(245, 158, 11, 0.05) 0px, transparent 50%);
             color: var(--text-main);
@@ -164,7 +166,8 @@
             color: var(--text-main);
         }
 
-        input[type="text"], select {
+        input[type="text"],
+        select {
             width: 100%;
             padding: 0.8rem 1rem;
             border: 1px solid var(--border);
@@ -174,7 +177,8 @@
             transition: border-color 0.2s;
         }
 
-        input:focus, select:focus {
+        input:focus,
+        select:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px var(--primary-light);
@@ -331,8 +335,15 @@
             font-weight: 600;
         }
 
-        .status-pass { background: #d1fae5; color: #065f46; }
-        .status-fail { background: #fee2e2; color: #991b1b; }
+        .status-pass {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-fail {
+            background: #fee2e2;
+            color: #991b1b;
+        }
 
         .check-item {
             display: flex;
@@ -342,19 +353,40 @@
             border-bottom: 1px solid var(--border);
         }
 
-        .check-item:last-child { border: none; }
+        .check-item:last-child {
+            border: none;
+        }
 
-        .check-icon { width: 20px; height: 20px; flex-shrink: 0; }
-        .check-icon.pass { color: var(--success); }
-        .check-icon.fail { color: var(--danger); }
+        .check-icon {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .check-icon.pass {
+            color: var(--success);
+        }
+
+        .check-icon.fail {
+            color: var(--danger);
+        }
 
         /* Animations */
         @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .hidden { display: none; }
+        .hidden {
+            display: none;
+        }
 
         /* Custom Checkbox */
         .checkbox-container {
@@ -366,12 +398,15 @@
             font-size: 1rem;
             user-select: none;
         }
+
         .checkbox-container input {
             position: absolute;
             opacity: 0;
             cursor: pointer;
-            height: 0; width: 0;
+            height: 0;
+            width: 0;
         }
+
         .checkmark {
             position: absolute;
             top: 2px;
@@ -381,17 +416,30 @@
             background-color: #eee;
             border-radius: 4px;
         }
-        .checkbox-container:hover input ~ .checkmark { background-color: #ccc; }
-        .checkbox-container input:checked ~ .checkmark { background-color: var(--primary); }
+
+        .checkbox-container:hover input~.checkmark {
+            background-color: #ccc;
+        }
+
+        .checkbox-container input:checked~.checkmark {
+            background-color: var(--primary);
+        }
+
         .checkmark:after {
             content: "";
             position: absolute;
             display: none;
         }
-        .checkbox-container input:checked ~ .checkmark:after { display: block; }
+
+        .checkbox-container input:checked~.checkmark:after {
+            display: block;
+        }
+
         .checkbox-container .checkmark:after {
-            left: 8px; top: 4px;
-            width: 5px; height: 10px;
+            left: 8px;
+            top: 4px;
+            width: 5px;
+            height: 10px;
             border: solid white;
             border-width: 0 2px 2px 0;
             transform: rotate(45deg);
@@ -405,8 +453,18 @@
             border-radius: var(--radius);
             margin-top: 2rem;
         }
-        .grad-possible { background: #ecfdf5; border: 2px solid #10b981; color: #065f46; }
-        .grad-impossible { background: #fff1f2; border: 2px solid #fb7185; color: #9f1239; }
+
+        .grad-possible {
+            background: #ecfdf5;
+            border: 2px solid #10b981;
+            color: #065f46;
+        }
+
+        .grad-impossible {
+            background: #fff1f2;
+            border: 2px solid #fb7185;
+            color: #9f1239;
+        }
 
         .grid-list {
             display: grid;
@@ -416,308 +474,325 @@
         }
     </style>
 </head>
+
 <body>
 
-<div class="container">
-    <header>
-        <div class="logo-container">
-            <img src="cnu_tech_logo.png" alt="CNU Tech Ed Logo" onerror="this.src='https://api.dicebear.com/7.x/initials/svg?seed=CNU&backgroundColor=004b99'">
-        </div>
-        <h1>기술교육전공 졸업사정</h1>
-        <p class="subtitle">충남대학교 교육대학원 자가 진단 시스템</p>
-    </header>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <img src="cnu_tech_logo.png" alt="CNU Tech Ed Logo"
+                    onerror="this.src='https://api.dicebear.com/7.x/initials/svg?seed=CNU&backgroundColor=004b99'">
+            </div>
+            <h1>기술교육전공 졸업사정</h1>
+            <p class="subtitle">충남대학교 교육대학원 자가 진단 시스템</p>
+        </header>
 
-    <div class="steps">
-        <div class="step active" id="step-dot-1">1</div>
-        <div class="step" id="step-dot-2">2</div>
-        <div class="step" id="step-dot-3">3</div>
-    </div>
+        <div class="steps">
+            <div class="step active" id="step-dot-1">1</div>
+            <div class="step" id="step-dot-2">2</div>
+            <div class="step" id="step-dot-3">3</div>
+        </div>
 
-    <!-- Step 1: Profile & Track Selection -->
-    <div id="step-1" class="card">
-        <h2 style="margin-bottom: 2rem;">기본 정보 입력</h2>
-        <div class="form-group">
-            <label for="student-id">학번</label>
-            <input type="text" id="student-id" placeholder="예: 202412345" maxlength="9">
-            <small id="id-hint" style="color: var(--text-muted); display: block; margin-top: 5px;">2023~2026학번 형식을 입력하세요.</small>
-        </div>
-        <div class="form-group">
-            <label for="student-name">성명</label>
-            <input type="text" id="student-name" placeholder="이름을 입력하세요">
-        </div>
-        <div class="form-group">
-            <label>입학 전형 및 과정 선택</label>
-            <div class="radio-group">
-                <div class="radio-box" onclick="selectTrack('yangseong_report')">
-                    <i data-lucide="book-open"></i>
-                    <div>
-                        <strong>양성 과정 (무논문 연구보고서)</strong>
-                        <div style="font-size: 0.85rem; color: var(--text-muted);">30학점(전공 24, 교직 6), 5학기, 연구보고서</div>
+        <!-- Step 1: Profile & Track Selection -->
+        <div id="step-1" class="card">
+            <h2 style="margin-bottom: 2rem;">기본 정보 입력</h2>
+            <div class="form-group">
+                <label for="student-id">학번</label>
+                <input type="text" id="student-id" placeholder="예: 202412345" maxlength="9">
+                <small id="id-hint" style="color: var(--text-muted); display: block; margin-top: 5px;">2023~2026학번 형식을
+                    입력하세요.</small>
+            </div>
+            <div class="form-group">
+                <label for="student-name">성명</label>
+                <input type="text" id="student-name" placeholder="이름을 입력하세요">
+            </div>
+            <div class="form-group">
+                <label>입학 전형 및 과정 선택</label>
+                <div class="radio-group">
+                    <div class="radio-box" onclick="selectTrack('yangseong_report')">
+                        <i data-lucide="book-open"></i>
+                        <div>
+                            <strong>양성 과정 (무논문 연구보고서)</strong>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">30학점(전공 24, 교직 6), 5학기, 연구보고서
+                            </div>
+                        </div>
+                    </div>
+                    <div class="radio-box" onclick="selectTrack('yangseong_thesis')">
+                        <i data-lucide="graduation-cap"></i>
+                        <div>
+                            <strong>양성 과정 (학위논문)</strong>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">24학점(전공 20, 교직 4), 4학기, 논문 제출
+                            </div>
+                        </div>
+                    </div>
+                    <div class="radio-box" onclick="selectTrack('minor_report')">
+                        <i data-lucide="layers"></i>
+                        <div>
+                            <strong>부전공 과정 (무논문 연구보고서)</strong>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">30학점(전공 30), 5학기, 연구보고서</div>
+                        </div>
                     </div>
                 </div>
-                <div class="radio-box" onclick="selectTrack('yangseong_thesis')">
-                    <i data-lucide="graduation-cap"></i>
-                    <div>
-                        <strong>양성 과정 (학위논문)</strong>
-                        <div style="font-size: 0.85rem; color: var(--text-muted);">24학점(전공 20, 교직 4), 4학기, 논문 제출</div>
-                    </div>
+                <input type="hidden" id="selected-track">
+            </div>
+            <div class="btn-container">
+                <div></div>
+                <button class="btn btn-primary" onclick="goToStep(2)">다음 단계 <i data-lucide="chevron-right"></i></button>
+            </div>
+        </div>
+
+        <!-- Step 2: Checklists -->
+        <div id="step-2" class="card hidden">
+            <h2 id="step2-title" style="margin-bottom: 2rem;">상세 이수 사항 체크</h2>
+
+            <!-- Undergraduate Recognition (Only for Major) -->
+            <div id="recognition-area" class="recognition-section hidden">
+                <h3 style="font-size: 1.1rem; margin-bottom: 1rem;"><i data-lucide="award"
+                        style="vertical-align: middle;"></i> 학부 과목 인정 (최대 3과목)</h3>
+                <p style="font-size: 0.9rem; color: #92400e; margin-bottom: 1rem;">학부에서 이수한 경우 체크하세요. 대학원 수강 학점에는 합산되지
+                    않으나 기본이수영역이 충족됩니다.</p>
+                <div class="grid-list" id="recognition-list">
+                    <!-- JS populated -->
                 </div>
-                <div class="radio-box" onclick="selectTrack('minor_report')">
-                    <i data-lucide="layers"></i>
-                    <div>
-                        <strong>부전공 과정 (무논문 연구보고서)</strong>
-                        <div style="font-size: 0.85rem; color: var(--text-muted);">30학점(전공 30), 5학기, 연구보고서</div>
-                    </div>
+            </div>
+
+            <!-- Course Enrollment -->
+            <div style="margin-bottom: 2.5rem;">
+                <h3><i data-lucide="book" style="vertical-align: middle;"></i> 학기별 수강 과목</h3>
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem;">학기당 최대 6학점(3과목)까지 가능합니다.
+                </p>
+                <div id="semesters-container" class="semester-grid">
+                    <!-- JS populated 4 or 5 blocks -->
                 </div>
             </div>
-            <input type="hidden" id="selected-track">
+
+            <!-- Other Requirements -->
+            <div style="margin-bottom: 2.5rem;">
+                <h3><i data-lucide="check-circle" style="vertical-align: middle;"></i> 기타 졸업 요건</h3>
+                <div class="grid-list">
+                    <label class="checkbox-container">성인지교육 1차 이수
+                        <input type="checkbox" id="check-gender1"><span class="checkmark"></span>
+                    </label>
+                    <label class="checkbox-container">성인지교육 2차 이수
+                        <input type="checkbox" id="check-gender2"><span class="checkmark"></span>
+                    </label>
+                    <label class="checkbox-container">연구윤리 이수
+                        <input type="checkbox" id="check-ethics"><span class="checkmark"></span>
+                    </label>
+                    <label class="checkbox-container">심폐소생술 1회 (서로 다른 년도)
+                        <input type="checkbox" id="check-cpr1"><span class="checkmark"></span>
+                    </label>
+                    <label class="checkbox-container">심폐소생술 2회 (서로 다른 년도)
+                        <input type="checkbox" id="check-cpr2"><span class="checkmark"></span>
+                    </label>
+                    <label class="checkbox-container">인적성검사 1회 적격
+                        <input type="checkbox" id="check-apt1"><span class="checkmark"></span>
+                    </label>
+                    <label class="checkbox-container">인적성검사 2회 적격
+                        <input type="checkbox" id="check-apt2"><span class="checkmark"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Comprehensive Exam -->
+            <div style="margin-bottom: 2.5rem;">
+                <h3><i data-lucide="edit-3" style="vertical-align: middle;"></i> 종합시험 합격 여부</h3>
+                <div class="grid-list">
+                    <label class="checkbox-container">교육학개론
+                        <input type="checkbox" id="exam-edu"><span class="checkmark"></span>
+                    </label>
+                    <label class="checkbox-container">기술교육론
+                        <input type="checkbox" id="exam-tecedu"><span class="checkmark"></span>
+                    </label>
+                    <label class="checkbox-container">건설기술
+                        <input type="checkbox" id="exam-construct"><span class="checkmark"></span>
+                    </label>
+                    <label class="checkbox-container">전기전자기술
+                        <input type="checkbox" id="exam-elec"><span class="checkmark"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Paper / Thesis Steps -->
+            <div id="paper-steps-area">
+                <h3><i data-lucide="file-text" style="vertical-align: middle;"></i> <span
+                        id="paper-type-label">연구보고서</span> 진행 단계</h3>
+                <div class="grid-list" id="paper-checklist">
+                    <!-- JS populated -->
+                </div>
+            </div>
+
+            <div class="btn-container">
+                <button class="btn btn-secondary" onclick="goToStep(1)"><i data-lucide="chevron-left"></i> 이전</button>
+                <button class="btn btn-primary" onclick="goToStep(3)">사정 결과 조회 <i data-lucide="search"></i></button>
+            </div>
         </div>
-        <div class="btn-container">
-            <div></div>
-            <button class="btn btn-primary" onclick="goToStep(2)">다음 단계 <i data-lucide="chevron-right"></i></button>
+
+        <!-- Step 3: Result -->
+        <div id="step-3" class="card hidden">
+            <h2 style="margin-bottom: 2rem; text-align: center;">졸업 사정 결과</h2>
+
+            <div id="result-profile"
+                style="text-align: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border);">
+                <h3 id="res-name" style="font-size: 1.5rem;">학부생님</h3>
+                <p id="res-track" style="color: var(--primary); font-weight: 600;">과정명</p>
+                <p id="res-id" style="color: var(--text-muted);">2024xxxxx</p>
+            </div>
+
+            <div class="result-dashboard">
+                <div class="stat-card">
+                    <div class="stat-label">이수 학점 (기준: <span id="req-credits">30</span>)</div>
+                    <div class="stat-value"><span id="curr-credits">0</span></div>
+                    <div id="credit-status" class="status-pill status-fail">미달</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">필수 영역 충족</div>
+                    <div class="stat-value"><span id="curr-areas">0</span><span
+                            style="font-size: 1rem; color: var(--text-muted);">/9</span></div>
+                    <div id="area-status" class="status-pill status-fail">미비</div>
+                </div>
+            </div>
+
+            <div class="card" style="background: white; padding: 1.5rem;">
+                <h3>상세 항목 점검</h3>
+                <div id="detailed-checks">
+                    <!-- Check items will be injected here -->
+                </div>
+            </div>
+
+            <div id="final-status" class="grad-impossible">
+                졸업 요건 미충족
+            </div>
+
+            <div class="btn-container">
+                <button class="btn btn-secondary" onclick="goToStep(2)"><i data-lucide="edit"></i> 정보 수정</button>
+                <button class="btn btn-primary" onclick="window.print()"><i data-lucide="printer"></i> PDF
+                    저장/인쇄</button>
+            </div>
         </div>
     </div>
 
-    <!-- Step 2: Checklists -->
-    <div id="step-2" class="card hidden">
-        <h2 id="step2-title" style="margin-bottom: 2rem;">상세 이수 사항 체크</h2>
-        
-        <!-- Undergraduate Recognition (Only for Major) -->
-        <div id="recognition-area" class="recognition-section hidden">
-            <h3 style="font-size: 1.1rem; margin-bottom: 1rem;"><i data-lucide="award" style="vertical-align: middle;"></i> 학부 과목 인정 (최대 3과목)</h3>
-            <p style="font-size: 0.9rem; color: #92400e; margin-bottom: 1rem;">학부에서 이수한 경우 체크하세요. 대학원 수강 학점에는 합산되지 않으나 기본이수영역이 충족됩니다.</p>
-            <div class="grid-list" id="recognition-list">
-                <!-- JS populated -->
-            </div>
-        </div>
+    <script>
+        const CONFIG = {
+            tracks: {
+                yangseong_report: { name: '양성 과정 (무논문 연구보고서)', total: 30, major: 24, edu: 6, semesters: 5, type: 'report' },
+                yangseong_thesis: { name: '양성 과정 (학위논문)', total: 24, major: 20, edu: 4, semesters: 4, type: 'thesis' },
+                minor_report: { name: '부전공 과정 (무논문 연구보고서)', total: 30, major: 30, edu: 0, semesters: 5, type: 'report' }
+            },
+            areas: [
+                { id: 'area_1', name: '기술교육론', subjects: ['기술교육론'] },
+                { id: 'area_2', name: '제조기술', subjects: ['제조기술'] },
+                { id: 'area_3', name: '건설기술', subjects: ['건설기술'] },
+                { id: 'area_4', name: '수송 및 동력', subjects: ['수송기술', '동력및에너지기술'] },
+                { id: 'area_5', name: '통신 및 전기전자', subjects: ['정보통신기술', '전기전자기술'] },
+                { id: 'area_6', name: '생명기술', subjects: ['생물기술'] }
+            ],
+            essentials: ['기술교육론', '기술과 논술', '기술과 교육과정 및 교재연구'],
+            major_subjects: [
+                '연구윤리', '기술교육과정연구', '건설기술', '동력및에너지기술', '수송기술',
+                '직업지도', '기술교육개인연구', '기술교육의최신과제', '기술교육세미나', '산업경영및심리학',
+                '기술교과교재연구', '기술교과교육학 연구', '기술교육 연구방법론', '기술 수업 방법론', '기술 학습 평가',
+                '기술교육혁신사례', '제조기술', '정보통신기술', '생물기술', '전기전자기술',
+                '산업공학특론', '창의공학설계', '발명과 문제해결연구', '전통기술 연구', '진로교육연구',
+                '기술교육론', '기술과 논술', '기술과 교육과정 및 교재연구', '특허와지식재산', '공업역학특론',
+                '기계기술특론', '인공지능교육연구', '피지컬컴퓨팅', '기술과사회', 'STEAM 교육연구',
+                '컴퓨터응용교육특론', '교육통계', '인적자원개발론'
+            ],
+            edu_subjects: [
+                '교육학개론', '교육행정 및 교육경영', '교육방법 및 교육공학', '교육심리', '교육평가',
+                '교육과 윤리, 도덕, 가치', '교육사회', '특수교육학개론', '교직실무', '생활지도 및 상담',
+                '교사전문성개발', '교육리더십'
+            ]
+        };
 
-        <!-- Course Enrollment -->
-        <div style="margin-bottom: 2.5rem;">
-            <h3><i data-lucide="book" style="vertical-align: middle;"></i> 학기별 수강 과목</h3>
-            <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem;">학기당 최대 6학점(3과목)까지 가능합니다.</p>
-            <div id="semesters-container" class="semester-grid">
-                <!-- JS populated 4 or 5 blocks -->
-            </div>
-        </div>
+        let state = {
+            currentStep: 1,
+            studentId: '',
+            name: '',
+            track: '',
+            recognition: [],
+            semesters: {}
+        };
 
-        <!-- Other Requirements -->
-        <div style="margin-bottom: 2.5rem;">
-            <h3><i data-lucide="check-circle" style="vertical-align: middle;"></i> 기타 졸업 요건</h3>
-            <div class="grid-list">
-                <label class="checkbox-container">성인지교육 1차 이수
-                    <input type="checkbox" id="check-gender1"><span class="checkmark"></span>
-                </label>
-                <label class="checkbox-container">성인지교육 2차 이수
-                    <input type="checkbox" id="check-gender2"><span class="checkmark"></span>
-                </label>
-                <label class="checkbox-container">연구윤리 이수
-                    <input type="checkbox" id="check-ethics"><span class="checkmark"></span>
-                </label>
-                <label class="checkbox-container">심폐소생술 1회 (서로 다른 년도)
-                    <input type="checkbox" id="check-cpr1"><span class="checkmark"></span>
-                </label>
-                <label class="checkbox-container">심폐소생술 2회 (서로 다른 년도)
-                    <input type="checkbox" id="check-cpr2"><span class="checkmark"></span>
-                </label>
-                <label class="checkbox-container">인적성검사 1회 적격
-                    <input type="checkbox" id="check-apt1"><span class="checkmark"></span>
-                </label>
-                <label class="checkbox-container">인적성검사 2회 적격
-                    <input type="checkbox" id="check-apt2"><span class="checkmark"></span>
-                </label>
-            </div>
-        </div>
+        function selectTrack(trackId) {
+            state.track = trackId;
+            document.querySelectorAll('.radio-box').forEach(box => box.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+            document.getElementById('selected-track').value = trackId;
+        }
 
-        <!-- Comprehensive Exam -->
-        <div style="margin-bottom: 2.5rem;">
-            <h3><i data-lucide="edit-3" style="vertical-align: middle;"></i> 종합시험 합격 여부</h3>
-            <div class="grid-list">
-                <label class="checkbox-container">교육학개론
-                    <input type="checkbox" id="exam-edu"><span class="checkmark"></span>
-                </label>
-                <label class="checkbox-container">기술교육론
-                    <input type="checkbox" id="exam-tecedu"><span class="checkmark"></span>
-                </label>
-                <label class="checkbox-container">건설기술
-                    <input type="checkbox" id="exam-construct"><span class="checkmark"></span>
-                </label>
-                <label class="checkbox-container">전기전자기술
-                    <input type="checkbox" id="exam-elec"><span class="checkmark"></span>
-                </label>
-            </div>
-        </div>
+        function goToStep(step) {
+            if (step === 2) {
+                const sid = document.getElementById('student-id').value;
+                const name = document.getElementById('student-name').value;
+                const track = state.track;
 
-        <!-- Paper / Thesis Steps -->
-        <div id="paper-steps-area">
-            <h3><i data-lucide="file-text" style="vertical-align: middle;"></i> <span id="paper-type-label">연구보고서</span> 진행 단계</h3>
-            <div class="grid-list" id="paper-checklist">
-                <!-- JS populated -->
-            </div>
-        </div>
+                if (!/^202[3-6]\d{5}$/.test(sid)) {
+                    alert('올바른 학번 형식을 입력하세요 (2023~2026학번)');
+                    return;
+                }
+                if (!name) { alert('이름을 입력하세요'); return; }
+                if (!track) { alert('과정을 선택하세요'); return; }
 
-        <div class="btn-container">
-            <button class="btn btn-secondary" onclick="goToStep(1)"><i data-lucide="chevron-left"></i> 이전</button>
-            <button class="btn btn-primary" onclick="goToStep(3)">사정 결과 조회 <i data-lucide="search"></i></button>
-        </div>
-    </div>
+                state.studentId = sid;
+                state.name = name;
 
-    <!-- Step 3: Result -->
-    <div id="step-3" class="card hidden">
-        <h2 style="margin-bottom: 2rem; text-align: center;">졸업 사정 결과</h2>
-        
-        <div id="result-profile" style="text-align: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border);">
-            <h3 id="res-name" style="font-size: 1.5rem;">학부생님</h3>
-            <p id="res-track" style="color: var(--primary); font-weight: 600;">과정명</p>
-            <p id="res-id" style="color: var(--text-muted);">2024xxxxx</p>
-        </div>
-
-        <div class="result-dashboard">
-            <div class="stat-card">
-                <div class="stat-label">이수 학점 (기준: <span id="req-credits">30</span>)</div>
-                <div class="stat-value"><span id="curr-credits">0</span></div>
-                <div id="credit-status" class="status-pill status-fail">미달</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">필수 영역 충족</div>
-                <div class="stat-value"><span id="curr-areas">0</span><span style="font-size: 1rem; color: var(--text-muted);">/9</span></div>
-                <div id="area-status" class="status-pill status-fail">미비</div>
-            </div>
-        </div>
-
-        <div class="card" style="background: white; padding: 1.5rem;">
-            <h3>상세 항목 점검</h3>
-            <div id="detailed-checks">
-                <!-- Check items will be injected here -->
-            </div>
-        </div>
-
-        <div id="final-status" class="grad-impossible">
-            졸업 요건 미충족
-        </div>
-
-        <div class="btn-container">
-            <button class="btn btn-secondary" onclick="goToStep(2)"><i data-lucide="edit"></i> 정보 수정</button>
-            <button class="btn btn-primary" onclick="window.print()"><i data-lucide="printer"></i> PDF 저장/인쇄</button>
-        </div>
-    </div>
-</div>
-
-<script>
-    const CONFIG = {
-        tracks: {
-            yangseong_report: { name: '양성 과정 (무논문 연구보고서)', total: 30, major: 24, edu: 6, semesters: 5, type: 'report' },
-            yangseong_thesis: { name: '양성 과정 (학위논문)', total: 24, major: 20, edu: 4, semesters: 4, type: 'thesis' },
-            minor_report: { name: '부전공 과정 (무논문 연구보고서)', total: 30, major: 30, edu: 0, semesters: 5, type: 'report' }
-        },
-        areas: [
-            { id: 'area_1', name: '기술교육론', subjects: ['기술교육론'] },
-            { id: 'area_2', name: '제조기술', subjects: ['제조기술'] },
-            { id: 'area_3', name: '건설기술', subjects: ['건설기술'] },
-            { id: 'area_4', name: '수송 및 동력', subjects: ['수송기술', '동력 및 에너지 기술'] },
-            { id: 'area_5', name: '통신 및 전기전자', subjects: ['정보통신기술', '전기전자기술'] },
-            { id: 'area_6', name: '생명기술', subjects: ['생물기술'] }
-        ],
-        essentials: ['기술교육론', '기술교육과정 및 교재연구', '기술과 논술'],
-        major_subjects: [
-            '기술교육론', '기술교육과정 및 교재연구', '기술과 논술',
-            '제조기술', '건설기술', '수송기술', '동력 및 에너지 기술',
-            '정보통신기술', '전기전자기술', '생물기술', '공학진로지도', '창의적공학설계', '기술교육세미나'
-        ],
-        edu_subjects: [
-            '교육학개론', '교육행정 및 교육경영', '교육방법 및 교육공학', '교육심리', '교육평가',
-            '교육과 윤리, 도덕, 가치', '교육사회', '특수교육학개론', '교직실무', '생활지도 및 상담',
-            '교사전문성개발', '교육리더십'
-        ]
-    };
-
-    let state = {
-        currentStep: 1,
-        studentId: '',
-        name: '',
-        track: '',
-        recognition: [],
-        semesters: {}
-    };
-
-    function selectTrack(trackId) {
-        state.track = trackId;
-        document.querySelectorAll('.radio-box').forEach(box => box.classList.remove('selected'));
-        event.currentTarget.classList.add('selected');
-        document.getElementById('selected-track').value = trackId;
-    }
-
-    function goToStep(step) {
-        if (step === 2) {
-            const sid = document.getElementById('student-id').value;
-            const name = document.getElementById('student-name').value;
-            const track = state.track;
-
-            if (!/^202[3-6]\d{5}$/.test(sid)) {
-                alert('올바른 학번 형식을 입력하세요 (2023~2026학번)');
-                return;
+                initStep2();
             }
-            if (!name) { alert('이름을 입력하세요'); return; }
-            if (!track) { alert('과정을 선택하세요'); return; }
 
-            state.studentId = sid;
-            state.name = name;
-            
-            initStep2();
+            if (step === 3) {
+                calculateResult();
+            }
+
+            document.getElementById(`step-${state.currentStep}`).classList.add('hidden');
+            document.getElementById(`step-dot-${state.currentStep}`).classList.remove('active');
+            if (state.currentStep < step) document.getElementById(`step-dot-${state.currentStep}`).classList.add('done');
+
+            state.currentStep = step;
+            document.getElementById(`step-${step}`).classList.remove('hidden');
+            document.getElementById(`step-dot-${step}`).classList.add('active');
+            window.scrollTo(0, 0);
         }
 
-        if (step === 3) {
-            calculateResult();
-        }
+        function initStep2() {
+            const trackInfo = CONFIG.tracks[state.track];
 
-        document.getElementById(`step-${state.currentStep}`).classList.add('hidden');
-        document.getElementById(`step-dot-${state.currentStep}`).classList.remove('active');
-        if (state.currentStep < step) document.getElementById(`step-dot-${state.currentStep}`).classList.add('done');
-        
-        state.currentStep = step;
-        document.getElementById(`step-${step}`).classList.remove('hidden');
-        document.getElementById(`step-dot-${step}`).classList.add('active');
-        window.scrollTo(0, 0);
-    }
-
-    function initStep2() {
-        const trackInfo = CONFIG.tracks[state.track];
-        
-        // Recognition logic (Only for yangseong)
-        const recArea = document.getElementById('recognition-area');
-        if (state.track.startsWith('yangseong')) {
-            recArea.classList.remove('hidden');
-            const recList = document.getElementById('recognition-list');
-            recList.innerHTML = CONFIG.areas.map(a => `
+            // Recognition logic (Only for yangseong)
+            const recArea = document.getElementById('recognition-area');
+            if (state.track.startsWith('yangseong')) {
+                recArea.classList.remove('hidden');
+                const recList = document.getElementById('recognition-list');
+                recList.innerHTML = CONFIG.areas.map(a => `
                 <label class="checkbox-container">${a.name}
                     <input type="checkbox" class="rec-check" data-area="${a.id}" onchange="limitRecognition(this)"><span class="checkmark"></span>
                 </label>
             `).join('');
-        } else {
-            recArea.classList.add('hidden');
-        }
+            } else {
+                recArea.classList.add('hidden');
+            }
 
-        // Semesters
-        const semCount = trackInfo.semesters;
-        const container = document.getElementById('semesters-container');
-        container.innerHTML = '';
-        for (let i = 1; i <= semCount; i++) {
-            const semDiv = document.createElement('div');
-            semDiv.className = 'semester-card';
-            semDiv.innerHTML = `
+            // Semesters
+            const semCount = trackInfo.semesters;
+            const container = document.getElementById('semesters-container');
+            container.innerHTML = '';
+            for (let i = 1; i <= semCount; i++) {
+                const semDiv = document.createElement('div');
+                semDiv.className = 'semester-card';
+                semDiv.innerHTML = `
                 <div class="semester-title">${i}학기 <span>최대 6학점</span></div>
                 <div class="course-slot"><select class="course-input" data-sem="${i}"><option value="">과목 1 선택</option>${getOptions()}</select></div>
                 <div class="course-slot"><select class="course-input" data-sem="${i}"><option value="">과목 2 선택</option>${getOptions()}</select></div>
                 <div class="course-slot"><select class="course-input" data-sem="${i}"><option value="">과목 3 선택</option>${getOptions()}</select></div>
             `;
-            container.appendChild(semDiv);
-        }
+                container.appendChild(semDiv);
+            }
 
-        // Paper steps
-        const paperType = trackInfo.type;
-        document.getElementById('paper-type-label').innerText = paperType === 'thesis' ? '학위논문' : '무논문 연구보고서';
-        const paperSteps = document.getElementById('paper-checklist');
-        if (paperType === 'report') {
-            paperSteps.innerHTML = `
+            // Paper steps
+            const paperType = trackInfo.type;
+            document.getElementById('paper-type-label').innerText = paperType === 'thesis' ? '학위논문' : '무논문 연구보고서';
+            const paperSteps = document.getElementById('paper-checklist');
+            if (paperType === 'report') {
+                paperSteps.innerHTML = `
                 <label class="checkbox-container">지도교수 신청<input type="checkbox" id="paper-step1"><span class="checkmark"></span></label>
                 <label class="checkbox-container">연구 주제 선정<input type="checkbox" id="paper-step2"><span class="checkmark"></span></label>
                 <label class="checkbox-container">보고서 작성 완료<input type="checkbox" id="paper-step3"><span class="checkmark"></span></label>
@@ -725,8 +800,8 @@
                 <label class="checkbox-container">결과심사 통과<input type="checkbox" id="paper-step5"><span class="checkmark"></span></label>
                 <label class="checkbox-container">소프트제본 제출<input type="checkbox" id="paper-step6"><span class="checkmark"></span></label>
             `;
-        } else {
-            paperSteps.innerHTML = `
+            } else {
+                paperSteps.innerHTML = `
                 <label class="checkbox-container">지도교수 신청<input type="checkbox" id="paper-step1"><span class="checkmark"></span></label>
                 <label class="checkbox-container">논문 주제 선정<input type="checkbox" id="paper-step2"><span class="checkmark"></span></label>
                 <label class="checkbox-container">예비/결과 심사 통과<input type="checkbox" id="paper-step3"><span class="checkmark"></span></label>
@@ -736,102 +811,102 @@
                 <label class="checkbox-container">통합정보시스템 업로드<input type="checkbox" id="paper-step7"><span class="checkmark"></span></label>
                 <label class="checkbox-container">저작권 서류 제출<input type="checkbox" id="paper-step8"><span class="checkmark"></span></label>
             `;
+            }
+            lucide.createIcons();
         }
-        lucide.createIcons();
-    }
 
-    function getOptions() {
-        let majors = CONFIG.major_subjects.map(s => `<option value="${s}">[전공] ${s}</option>`).join('');
-        let edus = CONFIG.edu_subjects.map(s => `<option value="${s}">[교직] ${s}</option>`).join('');
-        return majors + edus;
-    }
-
-    function limitRecognition(el) {
-        const checked = document.querySelectorAll('.rec-check:checked');
-        if (checked.length > 3) {
-            el.checked = false;
-            alert('학부 인정은 최대 3과목(6학점)까지만 가능합니다.');
+        function getOptions() {
+            let majors = CONFIG.major_subjects.map(s => `<option value="${s}">[전공] ${s}</option>`).join('');
+            let edus = CONFIG.edu_subjects.map(s => `<option value="${s}">[교직] ${s}</option>`).join('');
+            return majors + edus;
         }
-    }
 
-    function calculateResult() {
-        const trackInfo = CONFIG.tracks[state.track];
-        const courses = Array.from(document.querySelectorAll('.course-input')).map(sel => sel.value).filter(v => v);
-        
-        // 1. Credit Check
-        let totalMajor = 0;
-        let totalEdu = 0;
-        let uniqueCourses = new Set();
-        let hasDuplicate = false;
+        function limitRecognition(el) {
+            const checked = document.querySelectorAll('.rec-check:checked');
+            if (checked.length > 3) {
+                el.checked = false;
+                alert('학부 인정은 최대 3과목(6학점)까지만 가능합니다.');
+            }
+        }
 
-        courses.forEach(c => {
-            if (uniqueCourses.has(c)) hasDuplicate = true;
-            uniqueCourses.add(c);
-            if (CONFIG.major_subjects.includes(c)) totalMajor += 2;
-            else if (CONFIG.edu_subjects.includes(c)) totalEdu += 2;
-        });
+        function calculateResult() {
+            const trackInfo = CONFIG.tracks[state.track];
+            const courses = Array.from(document.querySelectorAll('.course-input')).map(sel => sel.value).filter(v => v);
 
-        const totalCredits = totalMajor + totalEdu;
-        
-        // 2. Areas Check
-        let satisfiedAreas = new Set();
-        // Check recognition
-        if (state.track.startsWith('yangseong')) {
-            document.querySelectorAll('.rec-check:checked').forEach(chk => {
-                satisfiedAreas.add(chk.getAttribute('data-area'));
+            // 1. Credit Check
+            let totalMajor = 0;
+            let totalEdu = 0;
+            let uniqueCourses = new Set();
+            let hasDuplicate = false;
+
+            courses.forEach(c => {
+                if (uniqueCourses.has(c)) hasDuplicate = true;
+                uniqueCourses.add(c);
+                if (CONFIG.major_subjects.includes(c)) totalMajor += 2;
+                else if (CONFIG.edu_subjects.includes(c)) totalEdu += 2;
             });
-        }
-        // Check taken courses
-        uniqueCourses.forEach(c => {
-            CONFIG.areas.forEach(a => {
-                if (a.subjects.includes(c)) satisfiedAreas.add(a.id);
+
+            const totalCredits = totalMajor + totalEdu;
+
+            // 2. Areas Check
+            let satisfiedAreas = new Set();
+            // Check recognition
+            if (state.track.startsWith('yangseong')) {
+                document.querySelectorAll('.rec-check:checked').forEach(chk => {
+                    satisfiedAreas.add(chk.getAttribute('data-area'));
+                });
+            }
+            // Check taken courses
+            uniqueCourses.forEach(c => {
+                CONFIG.areas.forEach(a => {
+                    if (a.subjects.includes(c)) satisfiedAreas.add(a.id);
+                });
             });
-        });
 
-        // 3. Essential Check
-        let satisfiedEssentials = CONFIG.essentials.filter(e => uniqueCourses.has(e));
+            // 3. Essential Check
+            let satisfiedEssentials = CONFIG.essentials.filter(e => uniqueCourses.has(e));
 
-        // 4. Extras Check
-        const checks = {
-            gender: document.getElementById('check-gender1').checked && document.getElementById('check-gender2').checked,
-            ethics: document.getElementById('check-ethics').checked,
-            cpr: document.getElementById('check-cpr1').checked && document.getElementById('check-cpr2').checked,
-            apt: document.getElementById('check-apt1').checked && document.getElementById('check-apt2').checked,
-            exam: document.getElementById('exam-edu').checked && document.getElementById('exam-tecedu').checked && 
-                  document.getElementById('exam-construct').checked && document.getElementById('exam-elec').checked
-        };
+            // 4. Extras Check
+            const checks = {
+                gender: document.getElementById('check-gender1').checked && document.getElementById('check-gender2').checked,
+                ethics: document.getElementById('check-ethics').checked,
+                cpr: document.getElementById('check-cpr1').checked && document.getElementById('check-cpr2').checked,
+                apt: document.getElementById('check-apt1').checked && document.getElementById('check-apt2').checked,
+                exam: document.getElementById('exam-edu').checked && document.getElementById('exam-tecedu').checked &&
+                    document.getElementById('exam-construct').checked && document.getElementById('exam-elec').checked
+            };
 
-        // 5. Paper Steps Check
-        const paperItems = Array.from(document.querySelectorAll('#paper-checklist input'));
-        const paperDone = paperItems.every(i => i.checked);
+            // 5. Paper Steps Check
+            const paperItems = Array.from(document.querySelectorAll('#paper-checklist input'));
+            const paperDone = paperItems.every(i => i.checked);
 
-        // Update UI
-        document.getElementById('res-name').innerText = state.name + ' 님';
-        document.getElementById('res-track').innerText = trackInfo.name;
-        document.getElementById('res-id').innerText = state.studentId;
-        document.getElementById('req-credits').innerText = trackInfo.total;
-        document.getElementById('curr-credits').innerText = totalCredits;
-        
-        const areaCount = satisfiedAreas.size + (satisfiedEssentials.length > 0 ? (satisfiedEssentials.includes('기술교육과정 및 교재연구') ? 1 : 0) + (satisfiedEssentials.includes('기술과 논술') ? 1 : 0) : 0);
-        // Simplified area metric: 6 areas + 3 essentials = 9 components. 
-        // Note: 기술교육론 is both Area 1 and Essential 1. So total unique components are 6 Areas + 2 Essentials = 8 components. 
-        // Let's just list them clearly.
-        
-        const creditPass = totalCredits >= trackInfo.total && totalMajor >= trackInfo.major && totalEdu >= trackInfo.edu && !hasDuplicate;
-        const areasPass = satisfiedAreas.size === 6 && CONFIG.essentials.every(e => uniqueCourses.has(e));
-        const extraPass = Object.values(checks).every(v => v) && paperDone;
+            // Update UI
+            document.getElementById('res-name').innerText = state.name + ' 님';
+            document.getElementById('res-track').innerText = trackInfo.name;
+            document.getElementById('res-id').innerText = state.studentId;
+            document.getElementById('req-credits').innerText = trackInfo.total;
+            document.getElementById('curr-credits').innerText = totalCredits;
 
-        const creditStatus = document.getElementById('credit-status');
-        creditStatus.className = 'status-pill ' + (creditPass ? 'status-pass' : 'status-fail');
-        creditStatus.innerText = creditPass ? '이수 완료' : (hasDuplicate ? '과목 중복' : '미충족');
+            const areaCount = satisfiedAreas.size + (satisfiedEssentials.length > 0 ? (satisfiedEssentials.includes('기술과 교육과정 및 교재연구') ? 1 : 0) + (satisfiedEssentials.includes('기술과 논술') ? 1 : 0) : 0);
+            // Simplified area metric: 6 areas + 3 essentials = 9 components. 
+            // Note: 기술교육론 is both Area 1 and Essential 1. So total unique components are 6 Areas + 2 Essentials = 8 components. 
+            // Let's just list them clearly.
 
-        const areaStatus = document.getElementById('area-status');
-        areaStatus.className = 'status-pill ' + (areasPass ? 'status-pass' : 'status-fail');
-        areaStatus.innerText = areasPass ? '전부 충족' : '일부 미비';
-        document.getElementById('curr-areas').innerText = satisfiedAreas.size;
+            const creditPass = totalCredits >= trackInfo.total && totalMajor >= trackInfo.major && totalEdu >= trackInfo.edu && !hasDuplicate;
+            const areasPass = satisfiedAreas.size === 6 && CONFIG.essentials.every(e => uniqueCourses.has(e));
+            const extraPass = Object.values(checks).every(v => v) && paperDone;
 
-        const detailDiv = document.getElementById('detailed-checks');
-        detailDiv.innerHTML = `
+            const creditStatus = document.getElementById('credit-status');
+            creditStatus.className = 'status-pill ' + (creditPass ? 'status-pass' : 'status-fail');
+            creditStatus.innerText = creditPass ? '이수 완료' : (hasDuplicate ? '과목 중복' : '미충족');
+
+            const areaStatus = document.getElementById('area-status');
+            areaStatus.className = 'status-pill ' + (areasPass ? 'status-pass' : 'status-fail');
+            areaStatus.innerText = areasPass ? '전부 충족' : '일부 미비';
+            document.getElementById('curr-areas').innerText = satisfiedAreas.size;
+
+            const detailDiv = document.getElementById('detailed-checks');
+            detailDiv.innerHTML = `
             <div class="check-item">
                 <i data-lucide="${creditPass ? 'check-circle' : 'x-circle'}" class="check-icon ${creditPass ? 'pass' : 'fail'}"></i>
                 <div>
@@ -867,22 +942,23 @@
             </div>
         `;
 
-        const finalStatus = document.getElementById('final-status');
-        if (creditPass && areasPass && extraPass) {
-            finalStatus.innerText = '축하합니다! 졸업이 가능합니다. 🎉';
-            finalStatus.className = 'grad-possible';
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-        } else {
-            finalStatus.innerText = '졸업 요건 미충족 (상세 항목을 확인하세요)';
-            finalStatus.className = 'grad-impossible';
+            const finalStatus = document.getElementById('final-status');
+            if (creditPass && areasPass && extraPass) {
+                finalStatus.innerText = '축하합니다! 졸업이 가능합니다. 🎉';
+                finalStatus.className = 'grad-possible';
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            } else {
+                finalStatus.innerText = '졸업 요건 미충족 (상세 항목을 확인하세요)';
+                finalStatus.className = 'grad-impossible';
+            }
+
+            lucide.createIcons();
         }
 
+        // Initialize
         lucide.createIcons();
-    }
-
-    // Initialize
-    lucide.createIcons();
-</script>
+    </script>
 
 </body>
+
 </html>
