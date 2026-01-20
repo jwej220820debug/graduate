@@ -829,9 +829,11 @@
                 state.name = name;
 
                 initStep2();
+                loadData();
             }
 
             if (step === 3) {
+                saveData();
                 calculateResult();
             }
 
@@ -894,25 +896,34 @@
             const paperSteps = document.getElementById('paper-checklist');
             if (paperType === 'report') {
                 paperSteps.innerHTML = `
-                <label class="checkbox-container">지도교수 신청<input type="checkbox" id="paper-step1"><span class="checkmark"></span></label>
-                <label class="checkbox-container">연구 주제 선정<input type="checkbox" id="paper-step2"><span class="checkmark"></span></label>
-                <label class="checkbox-container">보고서 작성 완료<input type="checkbox" id="paper-step3"><span class="checkmark"></span></label>
-                <label class="checkbox-container">예비심사 통과<input type="checkbox" id="paper-step4"><span class="checkmark"></span></label>
-                <label class="checkbox-container">결과심사 통과<input type="checkbox" id="paper-step5"><span class="checkmark"></span></label>
-                <label class="checkbox-container">소프트제본 제출<input type="checkbox" id="paper-step6"><span class="checkmark"></span></label>
+                <label class="checkbox-container">지도교수 신청<input type="checkbox" id="paper-step1" onchange="saveData()"><span class="checkmark"></span></label>
+                <label class="checkbox-container">연구 주제 선정<input type="checkbox" id="paper-step2" onchange="saveData()"><span class="checkmark"></span></label>
+                <label class="checkbox-container">보고서 작성 완료<input type="checkbox" id="paper-step3" onchange="saveData()"><span class="checkmark"></span></label>
+                <label class="checkbox-container">예비심사 통과<input type="checkbox" id="paper-step4" onchange="saveData()"><span class="checkmark"></span></label>
+                <label class="checkbox-container">결과심사 통과<input type="checkbox" id="paper-step5" onchange="saveData()"><span class="checkmark"></span></label>
+                <label class="checkbox-container">소프트제본 제출<input type="checkbox" id="paper-step6" onchange="saveData()"><span class="checkmark"></span></label>
             `;
             } else {
                 paperSteps.innerHTML = `
-                <label class="checkbox-container">지도교수 신청<input type="checkbox" id="paper-step1"><span class="checkmark"></span></label>
-                <label class="checkbox-container">논문 주제 선정<input type="checkbox" id="paper-step2"><span class="checkmark"></span></label>
-                <label class="checkbox-container">예비/결과 심사 통과<input type="checkbox" id="paper-step3"><span class="checkmark"></span></label>
-                <label class="checkbox-container">인준서 PDF/원본 제출<input type="checkbox" id="paper-step4"><span class="checkmark"></span></label>
-                <label class="checkbox-container">표절검사 결과 제출<input type="checkbox" id="paper-step5"><span class="checkmark"></span></label>
-                <label class="checkbox-container">dcollection 온라인 제출<input type="checkbox" id="paper-step6"><span class="checkmark"></span></label>
-                <label class="checkbox-container">통합정보시스템 업로드<input type="checkbox" id="paper-step7"><span class="checkmark"></span></label>
-                <label class="checkbox-container">저작권 서류 제출<input type="checkbox" id="paper-step8"><span class="checkmark"></span></label>
+                <label class="checkbox-container">지도교수 신청<input type="checkbox" id="paper-step1" onchange="saveData()"><span class="checkmark"></span></label>
+                <label class="checkbox-container">논문 주제 선정<input type="checkbox" id="paper-step2" onchange="saveData()"><span class="checkmark"></span></label>
+                <label class="checkbox-container">예비/결과 심사 통과<input type="checkbox" id="paper-step3" onchange="saveData()"><span class="checkmark"></span></label>
+                <label class="checkbox-container">인준서 PDF/원본 제출<input type="checkbox" id="paper-step4" onchange="saveData()"><span class="checkmark"></span></label>
+                <label class="checkbox-container">표절검사 결과 제출<input type="checkbox" id="paper-step5" onchange="saveData()"><span class="checkmark"></span></label>
+                <label class="checkbox-container">dcollection 온라인 제출<input type="checkbox" id="paper-step6" onchange="saveData()"><span class="checkmark"></span></label>
+                <label class="checkbox-container">통합정보시스템 업로드<input type="checkbox" id="paper-step7" onchange="saveData()"><span class="checkmark"></span></label>
+                <label class="checkbox-container">저작권 서류 제출<input type="checkbox" id="paper-step8" onchange="saveData()"><span class="checkmark"></span></label>
             `;
             }
+
+            // Other requirements auto-save
+            document.querySelectorAll('#step-2 input[type="checkbox"]').forEach(chk => {
+                chk.addEventListener('change', saveData);
+            });
+            document.querySelectorAll('.course-input').forEach(input => {
+                input.addEventListener('change', saveData);
+            });
+
             lucide.createIcons();
         }
 
@@ -1000,6 +1011,78 @@
                 el.checked = false;
                 alert('학부 인정은 최대 3과목(6학점)까지만 가능합니다.');
             }
+            saveData();
+        }
+
+        function saveData() {
+            if (!state.studentId) return;
+            const dataToSave = {
+                track: state.track,
+                recognition: Array.from(document.querySelectorAll('.rec-check:checked')).map(chk => chk.getAttribute('data-area')),
+                courses: Array.from(document.querySelectorAll('.course-input')).map(input => input.value),
+                checks: {
+                    gender1: document.getElementById('check-gender1').checked,
+                    gender2: document.getElementById('check-gender2').checked,
+                    ethics: document.getElementById('check-ethics').checked,
+                    cpr1: document.getElementById('check-cpr1').checked,
+                    cpr2: document.getElementById('check-cpr2').checked,
+                    apt1: document.getElementById('check-apt1').checked,
+                    apt2: document.getElementById('check-apt2').checked,
+                    examEdu: document.getElementById('exam-edu').checked,
+                    examTec: document.getElementById('exam-tecedu').checked,
+                    examCon: document.getElementById('exam-construct').checked,
+                    examElec: document.getElementById('exam-elec').checked
+                },
+                paperSteps: Array.from(document.querySelectorAll('#paper-checklist input')).map(i => i.checked)
+            };
+            localStorage.setItem(`CNU_GRAD_DATA_${state.studentId}_${state.name}`, JSON.stringify(dataToSave));
+            console.log('Data saved for', state.studentId);
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem(`CNU_GRAD_DATA_${state.studentId}_${state.name}`);
+            if (!saved) return;
+            const data = JSON.parse(saved);
+
+            // Hydrate Recognition
+            if (data.recognition) {
+                data.recognition.forEach(areaId => {
+                    const chk = document.querySelector(`.rec-check[data-area="${areaId}"]`);
+                    if (chk) chk.checked = true;
+                });
+            }
+
+            // Hydrate Courses
+            if (data.courses) {
+                const inputs = document.querySelectorAll('.course-input');
+                data.courses.forEach((val, idx) => {
+                    if (inputs[idx]) inputs[idx].value = val;
+                });
+            }
+
+            // Hydrate Checks
+            if (data.checks) {
+                document.getElementById('check-gender1').checked = data.checks.gender1;
+                document.getElementById('check-gender2').checked = data.checks.gender2;
+                document.getElementById('check-ethics').checked = data.checks.ethics;
+                document.getElementById('check-cpr1').checked = data.checks.cpr1;
+                document.getElementById('check-cpr2').checked = data.checks.cpr2;
+                document.getElementById('check-apt1').checked = data.checks.apt1;
+                document.getElementById('check-apt2').checked = data.checks.apt2;
+                document.getElementById('exam-edu').checked = data.checks.examEdu;
+                document.getElementById('exam-tecedu').checked = data.checks.examTec;
+                document.getElementById('exam-construct').checked = data.checks.examCon;
+                document.getElementById('exam-elec').checked = data.checks.examElec;
+            }
+
+            // Hydrate Paper Steps
+            if (data.paperSteps) {
+                const pSteps = document.querySelectorAll('#paper-checklist input');
+                data.paperSteps.forEach((val, idx) => {
+                    if (pSteps[idx]) pSteps[idx].checked = val;
+                });
+            }
+            console.log('Data loaded for', state.studentId);
         }
 
         function calculateResult() {
