@@ -472,6 +472,95 @@
             gap: 0.5rem;
             margin-top: 1rem;
         }
+
+        /* Custom Autocomplete */
+        .autocomplete-container {
+            position: relative;
+        }
+
+        .dropdown-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+            margin-top: 4px;
+        }
+
+        .dropdown-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #f8fafc;
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--primary-light);
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .subject-name {
+            font-weight: 500;
+        }
+
+        .category-badge {
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        /* Category Colors */
+        .color-basic {
+            color: #059669;
+        }
+
+        /* 기본이수 */
+        .bg-basic {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .color-essential {
+            color: #2563eb;
+        }
+
+        /* 교과교육 */
+        .bg-essential {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .color-major {
+            color: #4b5563;
+        }
+
+        /* 일반전공 */
+        .bg-major {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .color-edu {
+            color: #7c3aed;
+        }
+
+        /* 교직 */
+        .bg-edu {
+            background: #f5f3ff;
+            color: #5b21b6;
+        }
     </style>
 </head>
 
@@ -689,6 +778,7 @@
                 { id: 'area_6', name: '생명기술', subjects: ['생물기술'] }
             ],
             essentials: ['기술교육론', '기술과 논술', '기술과 교육과정 및 교재연구'],
+            basic_areas: ['제조기술', '건설기술', '수송기술', '동력및에너지기술', '정보통신기술', '전기전자기술', '생물기술'],
             major_subjects: [
                 '연구윤리', '기술교육과정연구', '건설기술', '동력및에너지기술', '수송기술',
                 '직업지도', '기술교육개인연구', '기술교육의최신과제', '기술교육세미나', '산업경영및심리학',
@@ -772,9 +862,6 @@
                 recArea.classList.add('hidden');
             }
 
-            // Update datalist based on track
-            updateDatalist(trackInfo.edu > 0);
-
             // Semesters
             const semCount = trackInfo.semesters;
             const container = document.getElementById('semesters-container');
@@ -783,12 +870,22 @@
                 const semDiv = document.createElement('div');
                 semDiv.className = 'semester-card';
                 semDiv.innerHTML = `
-                    <div class="semester-title">${i}학기 <span>최대 6학점</span></div>
-                    <div class="course-slot"><input type="text" list="subject-datalist" class="course-input" data-sem="${i}" placeholder="과목 입력 또는 선택"></div>
-                    <div class="course-slot"><input type="text" list="subject-datalist" class="course-input" data-sem="${i}" placeholder="과목 입력 또는 선택"></div>
-                    <div class="course-slot"><input type="text" list="subject-datalist" class="course-input" data-sem="${i}" placeholder="과목 입력 또는 선택"></div>
-                `;
+                <div class="semester-title">${i}학기 <span>최대 6학점</span></div>
+                <div class="course-slot autocomplete-container"><input type="text" class="course-input" data-sem="${i}" placeholder="과목 입력 또는 선택" onfocus="showDropdown(this)" oninput="filterDropdown(this)"></div>
+                <div class="course-slot autocomplete-container"><input type="text" class="course-input" data-sem="${i}" placeholder="과목 입력 또는 선택" onfocus="showDropdown(this)" oninput="filterDropdown(this)"></div>
+                <div class="course-slot autocomplete-container"><input type="text" class="course-input" data-sem="${i}" placeholder="과목 입력 또는 선택" onfocus="showDropdown(this)" oninput="filterDropdown(this)"></div>
+            `;
                 container.appendChild(semDiv);
+            }
+
+            // Close dropdown on click outside
+            if (!window.dropdownListenerAdded) {
+                document.addEventListener('click', (e) => {
+                    if (!e.target.classList.contains('course-input') && !e.target.closest('.dropdown-list')) {
+                        hideAllDropdowns();
+                    }
+                });
+                window.dropdownListenerAdded = true;
             }
 
             // Paper steps
@@ -819,13 +916,82 @@
             lucide.createIcons();
         }
 
-        function updateDatalist(includeEdu = true) {
-            const dl = document.getElementById('subject-datalist');
-            let options = CONFIG.major_subjects.map(s => `<option value="${s}">`).join('');
-            if (includeEdu) {
-                options += CONFIG.edu_subjects.map(s => `<option value="${s}">`).join('');
+        function getCategorizedSubjects(includeEdu) {
+            let subjects = [];
+
+            // 1. 기본이수교과
+            CONFIG.basic_areas.forEach(s => subjects.push({ name: s, cat: '기본이수', cls: 'basic' }));
+            // 2. 교과교육영역
+            CONFIG.essentials.filter(s => s !== '기술교육론').forEach(s => subjects.push({ name: s, cat: '교과교육', cls: 'essential' }));
+            // 기술교육론 is overlap, ensure unique names in display or specific labeling. 
+            // The prompt says order: 기본이수 -> 교과교육 -> 일반전공 -> 교직.
+            // If it's both, let's treat it as basic or essential. Let's make it easy.
+
+            // Build unique list with categories
+            const uniqueList = [];
+            const seen = new Set();
+
+            const add = (name, cat, cls) => {
+                if (seen.has(name)) return;
+                seen.add(name);
+                uniqueList.push({ name, cat, cls });
+            };
+
+            CONFIG.basic_areas.forEach(s => add(s, '기본이수', 'basic'));
+            CONFIG.essentials.forEach(s => add(s, '교과교육', 'essential'));
+            CONFIG.major_subjects.forEach(s => add(s, '일반전공', 'major'));
+            if (includeEdu) CONFIG.edu_subjects.forEach(s => add(s, '교직과목', 'edu'));
+
+            return uniqueList;
+        }
+
+        function showDropdown(input) {
+            hideAllDropdowns();
+            const container = input.parentElement;
+            const trackInfo = CONFIG.tracks[state.track];
+            const subjects = getCategorizedSubjects(trackInfo.edu > 0);
+
+            createDropdown(container, input, subjects);
+        }
+
+        function filterDropdown(input) {
+            const container = input.parentElement;
+            const val = input.value.toLowerCase();
+            const trackInfo = CONFIG.tracks[state.track];
+            const subjects = getCategorizedSubjects(trackInfo.edu > 0).filter(s => s.name.toLowerCase().includes(val));
+
+            createDropdown(container, input, subjects);
+        }
+
+        function createDropdown(container, input, subjects) {
+            let list = container.querySelector('.dropdown-list');
+            if (list) list.remove();
+
+            list = document.createElement('div');
+            list.className = 'dropdown-list';
+
+            if (subjects.length === 0) {
+                list.innerHTML = '<div class="dropdown-item" style="color: var(--text-muted);">검색 결과 없음</div>';
+            } else {
+                subjects.forEach(s => {
+                    const item = document.createElement('div');
+                    item.className = 'dropdown-item';
+                    item.innerHTML = `
+                        <span class="subject-name color-${s.cls}">${s.name}</span>
+                        <span class="category-badge bg-${s.cls}">${s.cat}</span>
+                    `;
+                    item.onclick = () => {
+                        input.value = s.name;
+                        list.remove();
+                    };
+                    list.appendChild(item);
+                });
             }
-            dl.innerHTML = options;
+            container.appendChild(list);
+        }
+
+        function hideAllDropdowns() {
+            document.querySelectorAll('.dropdown-list').forEach(l => l.remove());
         }
 
         function limitRecognition(el) {
