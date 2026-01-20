@@ -703,6 +703,32 @@
             background-color: #fff1f2 !important;
             /* Keep red-ish for fail */
         }
+
+        .dropdown-item.disabled {
+            color: #ccc;
+            cursor: not-allowed;
+            background: #f9f9f9;
+        }
+
+        .dropdown-item.disabled .subject-name {
+            text-decoration: line-through;
+            color: #aaa;
+        }
+
+        .semester-footer {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed var(--border);
+            text-align: right;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .semester-footer span {
+            color: var(--primary);
+            font-size: 1rem;
+        }
     </style>
 </head>
 
@@ -851,7 +877,13 @@
             </div>
 
             <div style="margin-bottom: 2.5rem;">
-                <h3><i data-lucide="clipboard-check" style="vertical-align: middle;"></i> 졸업요건5. 교직 적성 및 인성 검사</h3>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap;">
+                    <h3><i data-lucide="clipboard-check" style="vertical-align: middle;"></i> 졸업요건5. 교직 적성 및 인성 검사</h3>
+                    <a href="https://egc.cnu.ac.kr/egc/board/notice.do?mode=view&articleNo=566109&article.offset=0&articleLimit=15&srSearchVal=%EC%A0%81%EC%84%B1"
+                        target="_blank" class="guide-link">
+                        <i data-lucide="external-link" style="width: 14px; height: 14px;"></i> 시행안내 확인
+                    </a>
+                </div>
                 <div class="grid-list">
                     <label class="checkbox-container">교직 적성 및 인성 검사 1회 적격
                         <input type="checkbox" id="check-apt1"><span class="checkmark"></span>
@@ -1056,6 +1088,7 @@
                 <div class="course-slot autocomplete-container"><input type="text" class="course-input" data-sem="${i}" placeholder="과목 입력 또는 선택" onfocus="showDropdown(this)" oninput="filterDropdown(this)"></div>
                 <div class="course-slot autocomplete-container"><input type="text" class="course-input" data-sem="${i}" placeholder="과목 입력 또는 선택" onfocus="showDropdown(this)" oninput="filterDropdown(this)"></div>
                 <div class="course-slot autocomplete-container"><input type="text" class="course-input" data-sem="${i}" placeholder="과목 입력 또는 선택" onfocus="showDropdown(this)" oninput="filterDropdown(this)"></div>
+                <div class="semester-footer" id="sem-total-${i}">학기 합계: <span>0</span> 학점</div>
             `;
                 container.appendChild(semDiv);
             }
@@ -1101,10 +1134,29 @@
                 chk.addEventListener('change', saveData);
             });
             document.querySelectorAll('.course-input').forEach(input => {
-                input.addEventListener('change', saveData);
+                input.addEventListener('change', () => {
+                    saveData();
+                    updateSemesterCredits();
+                });
             });
 
+            updateSemesterCredits();
             lucide.createIcons();
+        }
+
+        function updateSemesterCredits() {
+            const inputs = document.querySelectorAll('.course-input');
+            const totals = {};
+            inputs.forEach(input => {
+                const sem = input.getAttribute('data-sem');
+                if (!totals[sem]) totals[sem] = 0;
+                if (input.value.trim()) totals[sem] += 2;
+            });
+
+            for (let sem in totals) {
+                const el = document.getElementById(`sem-total-${sem}`);
+                if (el) el.querySelector('span').innerText = totals[sem];
+            }
         }
 
         function getCategorizedSubjects(includeEdu) {
@@ -1161,30 +1213,38 @@
             list = document.createElement('div');
             list.className = 'dropdown-list';
 
+            // Get currently selected subjects to mark duplicates
+            const selectedSubjects = new Set(
+                Array.from(document.querySelectorAll('.course-input'))
+                    .map(inp => inp.value.trim())
+                    .filter(v => v !== '' && v !== input.value.trim())
+            );
+
             if (subjects.length === 0) {
                 list.innerHTML = '<div class="dropdown-item" style="color: var(--text-muted);">검색 결과 없음</div>';
             } else {
                 subjects.forEach(s => {
+                    const isDuplicate = selectedSubjects.has(s.name);
                     const item = document.createElement('div');
-                    item.className = 'dropdown-item';
+                    item.className = 'dropdown-item' + (isDuplicate ? ' disabled' : '');
                     item.innerHTML = `
-                        <span class="subject-name color-${s.cls}">${s.name}</span>
+                        <div style="display: flex; flex-direction: column;">
+                            <span class="subject-name color-${s.cls}">${s.name}</span>
+                            <span style="font-size: 0.7rem; color: var(--text-muted);">(2학점)</span>
+                        </div>
                         <span class="category-badge bg-${s.cls}">${s.cat}</span>
                     `;
-                    item.onclick = () => {
-                        // Check for duplicates across all inputs
-                        const allInputs = Array.from(document.querySelectorAll('.course-input'));
-                        const isDuplicate = allInputs.some(inp => inp !== input && inp.value === s.name);
 
-                        if (isDuplicate) {
-                            alert(`'${s.name}' 과목은 이미 다른 학기에 선택되어 있습니다. 중복 선택은 불가능합니다.`);
-                            input.value = '';
-                        } else {
+                    if (!isDuplicate) {
+                        item.onclick = () => {
                             input.value = s.name;
                             saveData();
-                        }
-                        list.remove();
-                    };
+                            updateSemesterCredits();
+                            list.remove();
+                        };
+                    } else {
+                        item.title = "이미 다른 슬롯에 선택된 과목입니다.";
+                    }
                     list.appendChild(item);
                 });
             }
@@ -1248,6 +1308,7 @@
                 data.courses.forEach((val, idx) => {
                     if (inputs[idx]) inputs[idx].value = val;
                 });
+                updateSemesterCredits();
             }
 
             // Hydrate Checks
@@ -1369,6 +1430,7 @@
                 gender: "https://egc.cnu.ac.kr/egc/board/notice.do?mode=view&articleNo=288590&article.offset=0&articleLimit=15&srSearchVal=%EC%84%B1%EC%9D%B8%EC%A7%80%EA%B5%90%EC%9C%A1",
                 ethics: "https://egc.cnu.ac.kr/egc/board/notice.do?mode=view&articleNo=538237&article.offset=0&articleLimit=15&srSearchVal=%EC%97%B0%EA%B5%AC%EC%9C%A4%EB%A6%AC",
                 cpr: "https://egc.cnu.ac.kr/egc/board/notice.do?mode=view&articleNo=569225&article.offset=0&articleLimit=15&srSearchVal=%EC%8B%AC%ED%8F%90%EC%86%8C%EC%83%9D",
+                apt: "https://egc.cnu.ac.kr/egc/board/notice.do?mode=view&articleNo=566109&article.offset=0&articleLimit=15&srSearchVal=%EC%A0%81%EC%84%B1",
                 exam: "https://egc.cnu.ac.kr/egc/board/notice.do?mode=view&articleNo=573353&article.offset=0&articleLimit=15&srSearchVal=%EC%A2%85%ED%95%A9%EC%8B%9C%ED%97%98"
             };
 
@@ -1419,6 +1481,7 @@
                     id: 5,
                     title: "졸업요건5. 교직 적성 및 인성 검사",
                     pass: checks.apt,
+                    guide: links.apt,
                     items: [
                         { text: "적성 및 인성 검사 1회 적격", pass: document.getElementById('check-apt1').checked },
                         { text: "적성 및 인성 검사 2회 적격", pass: document.getElementById('check-apt2').checked }
