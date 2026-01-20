@@ -866,9 +866,21 @@
             font-weight: 600;
         }
 
-        .semester-footer span {
-            color: var(--primary);
-            font-size: 1rem;
+        .section-header-shaded {
+            background: #f1f5f9;
+            padding: 0.75rem 1.25rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 5px solid var(--primary);
+        }
+
+        .section-header-shaded h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: var(--text-main);
         }
     </style>
 </head>
@@ -951,36 +963,45 @@
 
         <!-- Step 2: Checklists -->
         <div id="step-2" class="card hidden">
-            <h2 id="step2-title" style="margin-bottom: 2rem;">상세 이수 사항 체크</h2>
+            <h2 id="step2-title" style="margin-bottom: 2.5rem; text-align: center; font-family: 'Outfit';">전공 및 교직 이수 현황
+            </h2>
 
-            <!-- Undergraduate Recognition (Only for Major) -->
-            <div id="recognition-area" class="recognition-section hidden">
-                <h3 style="font-size: 1.1rem; margin-bottom: 1rem;"><i data-lucide="award"
-                        style="vertical-align: middle;"></i> 학부 과목 인정 (최대 3과목)</h3>
-                <p style="font-size: 0.9rem; color: #92400e; margin-bottom: 1rem;">학부에서 이수한 경우 체크하세요. 대학원 수강 학점에는 합산되지
-                    않으나 기본이수영역이 충족됩니다.</p>
-                <div class="grid-list" id="recognition-list">
+            <div class="total-progress-badge" id="total-credit-progress-bar">
+                <div style="font-weight: 600; color: var(--text-main); font-size: 1.1rem;">실시간 총 이수 학점</div>
+                <div style="font-size: 1.25rem;" id="total-credit-status-text">
+                    <span class="credit-text-red">0</span> / <span class="credit-text-blue">30</span> 학점
+                </div>
+            </div>
+
+            <!-- Graduation Requirement 1 -->
+            <div style="margin-bottom: 3.5rem;">
+                <div class="section-header-shaded">
+                    <h3><i data-lucide="book-open" style="vertical-align: middle;"></i> 졸업요건1. 수업 및 학점</h3>
+                </div>
+
+                <!-- Undergraduate Recognition (Only for Major) -->
+                <div id="recognition-area" class="recognition-section hidden">
+                    <h3 style="font-size: 1rem; margin-bottom: 1rem;">학부 과목 인정 (최대 3과목)</h3>
+                    <p style="font-size: 0.85rem; color: #92400e; margin-bottom: 1rem;">학부에서 이수한 경우 체크하세요. 대학원 수강 학점에는
+                        합산되지
+                        않으나 기본이수영역이 충족됩니다.</p>
+                    <div class="grid-list" id="recognition-list"
+                        style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+                        <!-- JS populated -->
+                    </div>
+                </div>
+
+                <div class="semester-grid" id="semesters-container">
                     <!-- JS populated -->
                 </div>
             </div>
 
-            <!-- Course Enrollment -->
             <div style="margin-bottom: 2.5rem;">
-                <h3><i data-lucide="book" style="vertical-align: middle;"></i> 졸업요건1. 학점</h3>
-                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem;">학기당 최대 6학점(3과목)까지 가능합니다.
-                </p>
-                <div id="semesters-container" class="semester-grid">
-                    <!-- JS populated 4 or 5 blocks -->
-                </div>
-            </div>
-
-            <!-- Other Requirements divided into Chapters -->
-            <div style="margin-bottom: 2.5rem;">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap;">
+                <div class="section-header-shaded">
                     <h3><i data-lucide="users" style="vertical-align: middle;"></i> 졸업요건2. 성인지교육</h3>
                     <a href="https://egc.cnu.ac.kr/egc/board/notice.do?mode=view&articleNo=288590&article.offset=0&articleLimit=15&srSearchVal=%EC%84%B1%EC%9D%B8%EC%A7%80%EA%B5%90%EC%9C%A1"
-                        target="_blank" class="guide-link">
-                        <i data-lucide="external-link" style="width: 14px; height: 14px;"></i> 이수방법 안내
+                        target="_blank" class="guide-link" style="margin-top:0;">
+                        <i data-lucide="external-link" style="width: 14px; height: 14px;"></i> 안내
                     </a>
                 </div>
                 <div class="grid-list">
@@ -994,11 +1015,11 @@
             </div>
 
             <div style="margin-bottom: 2.5rem;">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap;">
+                <div class="section-header-shaded">
                     <h3><i data-lucide="shield-check" style="vertical-align: middle;"></i> 졸업요건3. 연구윤리</h3>
                     <a href="https://egc.cnu.ac.kr/egc/board/notice.do?mode=view&articleNo=538237&article.offset=0&articleLimit=15&srSearchVal=%EC%97%B0%EA%B5%AC%EC%9C%A4%EB%A6%AC"
-                        target="_blank" class="guide-link">
-                        <i data-lucide="external-link" style="width: 14px; height: 14px;"></i> 이수방법 안내
+                        target="_blank" class="guide-link" style="margin-top:0;">
+                        <i data-lucide="external-link" style="width: 14px; height: 14px;"></i> 안내
                     </a>
                 </div>
                 <div class="grid-list">
@@ -1009,11 +1030,11 @@
             </div>
 
             <div style="margin-bottom: 2.5rem;">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap;">
+                <div class="section-header-shaded">
                     <h3><i data-lucide="heart-pulse" style="vertical-align: middle;"></i> 졸업요건4. 심폐소생술</h3>
                     <a href="https://egc.cnu.ac.kr/egc/board/notice.do?mode=view&articleNo=569225&article.offset=0&articleLimit=15&srSearchVal=%EC%8B%AC%ED%8F%90%EC%86%8C%EC%83%9D"
-                        target="_blank" class="guide-link">
-                        <i data-lucide="external-link" style="width: 14px; height: 14px;"></i> 제출방법 안내
+                        target="_blank" class="guide-link" style="margin-top:0;">
+                        <i data-lucide="external-link" style="width: 14px; height: 14px;"></i> 안내
                     </a>
                 </div>
                 <div class="grid-list">
@@ -1027,11 +1048,11 @@
             </div>
 
             <div style="margin-bottom: 2.5rem;">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap;">
+                <div class="section-header-shaded">
                     <h3><i data-lucide="clipboard-check" style="vertical-align: middle;"></i> 졸업요건5. 교직 적성 및 인성 검사</h3>
                     <a href="https://egc.cnu.ac.kr/egc/board/notice.do?mode=view&articleNo=566109&article.offset=0&articleLimit=15&srSearchVal=%EC%A0%81%EC%84%B1"
-                        target="_blank" class="guide-link">
-                        <i data-lucide="external-link" style="width: 14px; height: 14px;"></i> 시행안내 확인
+                        target="_blank" class="guide-link" style="margin-top:0;">
+                        <i data-lucide="external-link" style="width: 14px; height: 14px;"></i> 안내
                     </a>
                 </div>
                 <div class="grid-list">
@@ -1044,13 +1065,12 @@
                 </div>
             </div>
 
-            <!-- Comprehensive Exam -->
             <div style="margin-bottom: 2.5rem;">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap;">
-                    <h3><i data-lucide="edit-3" style="vertical-align: middle;"></i> 졸업요건6. 종합시험 합격 과목</h3>
+                <div class="section-header-shaded">
+                    <h3><i data-lucide="edit-3" style="vertical-align: middle;"></i> 졸업요건6. 종합시험 합격</h3>
                     <a href="https://egc.cnu.ac.kr/egc/board/notice.do?mode=view&articleNo=573353&article.offset=0&articleLimit=15&srSearchVal=%EC%A2%85%ED%95%A9%EC%8B%9C%ED%97%98"
-                        target="_blank" class="guide-link">
-                        <i data-lucide="external-link" style="width: 14px; height: 14px;"></i> 안내 바로가기
+                        target="_blank" class="guide-link" style="margin-top:0;">
+                        <i data-lucide="external-link" style="width: 14px; height: 14px;"></i> 안내
                     </a>
                 </div>
                 <div class="grid-list">
@@ -1071,8 +1091,10 @@
 
             <!-- Paper / Thesis Steps -->
             <div id="paper-steps-area">
-                <h3><i data-lucide="file-text" style="vertical-align: middle;"></i> 졸업요건7. <span
-                        id="paper-type-label">연구보고서</span></h3>
+                <div class="section-header-shaded">
+                    <h3><i data-lucide="file-text" style="vertical-align: middle;"></i> 졸업요건7. <span
+                            id="paper-type-label">연구보고서</span></h3>
+                </div>
                 <div class="grid-list" id="paper-checklist">
                     <!-- JS populated -->
                 </div>
@@ -1563,18 +1585,6 @@
             const paperItems = Array.from(document.querySelectorAll('#paper-checklist input'));
             const paperDone = paperItems.every(i => i.checked);
 
-            // Update UI
-            const isAllPass = creditPass && areasPass && extraPass;
-            const statusLabel = isAllPass
-                ? '<span style="color: var(--success); font-weight: 800;">[졸업 요건 충족]</span>'
-                : '<span style="color: var(--danger); font-weight: 800;">[졸업 요건 미충족]</span>';
-
-            document.getElementById('res-name').innerHTML = `${state.name} 님 ${statusLabel}`;
-            document.getElementById('res-track').innerText = trackInfo.name;
-            document.getElementById('res-id').innerText = state.studentId;
-            document.getElementById('req-credits').innerText = trackInfo.total;
-            document.getElementById('curr-credits').innerText = totalCredits;
-
             const creditPass = totalCredits >= trackInfo.total && totalMajor >= trackInfo.major && totalEdu >= trackInfo.edu && !hasDuplicate;
 
             // Areas check restructured: 5 basic + 1 essential (all 3 subjects)
@@ -1585,8 +1595,19 @@
 
             // Requirement 1 Pass condition: Both Credits AND Areas must be met
             const req1Pass = creditPass && areasPass;
-
             const extraPass = Object.values(checks).every(v => v) && paperDone;
+
+            // Update UI
+            const isAllPass = req1Pass && extraPass; // Fixed: Use req1Pass
+            const statusLabel = isAllPass
+                ? '<span style="color: var(--success); font-weight: 800;">[졸업 요건 충족]</span>'
+                : '<span style="color: var(--danger); font-weight: 800;">[졸업 요건 미충족]</span>';
+
+            document.getElementById('res-name').innerHTML = `${state.name} 님 ${statusLabel}`;
+            document.getElementById('res-track').innerText = trackInfo.name;
+            document.getElementById('res-id').innerText = state.studentId;
+            document.getElementById('req-credits').innerText = trackInfo.total;
+            document.getElementById('curr-credits').innerText = totalCredits;
 
             const creditStatus = document.getElementById('credit-status');
             creditStatus.className = 'status-pill ' + (creditPass ? 'status-pass' : 'status-fail');
