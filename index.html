@@ -1415,6 +1415,9 @@
             const totalRequirementsCount = basicAreasCount + (essentialPass ? 1 : 0);
             const areasPass = totalRequirementsCount === 6;
 
+            // Requirement 1 Pass condition: Both Credits AND Areas must be met
+            const req1Pass = creditPass && areasPass;
+
             const extraPass = Object.values(checks).every(v => v) && paperDone;
 
             const creditStatus = document.getElementById('credit-status');
@@ -1439,12 +1442,13 @@
             const requirements = [
                 {
                     id: 1,
-                    title: "졸업요건1. 학점",
-                    pass: creditPass,
+                    title: "졸업요건1. 수업 및 학점",
+                    pass: req1Pass,
                     items: [
                         { text: `전체 ${trackInfo.total}학점 중 ${totalCredits}학점 이수`, pass: totalCredits >= trackInfo.total, type: 'total' },
                         { text: `전공(일반/기본) ${trackInfo.major}학점 중 ${totalMajor}학점 이수`, pass: totalMajor >= trackInfo.major, type: 'major' },
                         { text: `교직 ${trackInfo.edu}학점 중 ${totalEdu}학점 이수`, pass: totalEdu >= trackInfo.edu, type: 'edu' },
+                        ...(!areasPass ? [{ text: "기본이수 및 교과교육 영역 미충족", pass: false }] : []),
                         ...(hasDuplicate ? [{ text: "중복 선택된 과목 존재", pass: false }] : [])
                     ]
                 },
@@ -1514,8 +1518,8 @@
             const areaRequirement = {
                 title: "추가: 기본이수 및 교과교육 영역",
                 items: [
-                    ...CONFIG.areas.map(a => ({ text: `기본이수 [${a.name}]`, pass: satisfiedAreas.has(a.id) })),
-                    ...CONFIG.essentials.map(e => ({ text: `교과교육 [${e}]`, pass: uniqueCourses.has(e) }))
+                    ...CONFIG.areas.map(a => ({ text: `기본이수 [${a.name}]`, pass: satisfiedAreas.has(a.id), color: '#059669' })),
+                    ...CONFIG.essentials.map(e => ({ text: `교과교육 [${e}]`, pass: uniqueCourses.has(e), color: '#2563eb' }))
                 ]
             };
 
@@ -1548,7 +1552,7 @@
                                 <strong style="font-size: 0.85rem; display: block; margin-bottom: 0.5rem;">세부 영역 이수 현황</strong>
                                 <div class="grid-list" style="font-size: 0.8rem;">
                                     ${areaRequirement.items.map(i => `
-                                        <div style="color: ${i.pass ? 'var(--success)' : 'var(--text-muted)'}; display: flex; align-items: center; gap: 4px;">
+                                        <div style="color: ${i.pass ? i.color : 'var(--text-muted)'}; display: flex; align-items: center; gap: 4px; border: 1px solid ${i.pass ? i.color + '44' : '#eee'}; padding: 4px 8px; border-radius: 4px; font-weight: ${i.pass ? '700' : '400'};">
                                             <i data-lucide="${i.pass ? 'check' : 'circle'}" style="width: 10px;"></i> ${i.text}
                                         </div>
                                     `).join('')}
