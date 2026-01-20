@@ -478,6 +478,7 @@
 <body>
 
     <div class="container">
+        <datalist id="subject-datalist"></datalist>
         <header>
             <div class="logo-container">
                 <img src="cnu_tech_logo.png" alt="CNU Tech Ed Logo"
@@ -771,6 +772,9 @@
                 recArea.classList.add('hidden');
             }
 
+            // Update datalist based on track
+            updateDatalist(trackInfo.edu > 0);
+
             // Semesters
             const semCount = trackInfo.semesters;
             const container = document.getElementById('semesters-container');
@@ -779,11 +783,11 @@
                 const semDiv = document.createElement('div');
                 semDiv.className = 'semester-card';
                 semDiv.innerHTML = `
-                <div class="semester-title">${i}학기 <span>최대 6학점</span></div>
-                <div class="course-slot"><select class="course-input" data-sem="${i}"><option value="">과목 1 선택</option>${getOptions()}</select></div>
-                <div class="course-slot"><select class="course-input" data-sem="${i}"><option value="">과목 2 선택</option>${getOptions()}</select></div>
-                <div class="course-slot"><select class="course-input" data-sem="${i}"><option value="">과목 3 선택</option>${getOptions()}</select></div>
-            `;
+                    <div class="semester-title">${i}학기 <span>최대 6학점</span></div>
+                    <div class="course-slot"><input type="text" list="subject-datalist" class="course-input" data-sem="${i}" placeholder="과목 입력 또는 선택"></div>
+                    <div class="course-slot"><input type="text" list="subject-datalist" class="course-input" data-sem="${i}" placeholder="과목 입력 또는 선택"></div>
+                    <div class="course-slot"><input type="text" list="subject-datalist" class="course-input" data-sem="${i}" placeholder="과목 입력 또는 선택"></div>
+                `;
                 container.appendChild(semDiv);
             }
 
@@ -815,10 +819,13 @@
             lucide.createIcons();
         }
 
-        function getOptions() {
-            let majors = CONFIG.major_subjects.map(s => `<option value="${s}">[전공] ${s}</option>`).join('');
-            let edus = CONFIG.edu_subjects.map(s => `<option value="${s}">[교직] ${s}</option>`).join('');
-            return majors + edus;
+        function updateDatalist(includeEdu = true) {
+            const dl = document.getElementById('subject-datalist');
+            let options = CONFIG.major_subjects.map(s => `<option value="${s}">`).join('');
+            if (includeEdu) {
+                options += CONFIG.edu_subjects.map(s => `<option value="${s}">`).join('');
+            }
+            dl.innerHTML = options;
         }
 
         function limitRecognition(el) {
