@@ -1842,9 +1842,10 @@
 
             // Hide/Show mandatory requirements based on track
             const isRetraining = state.track.startsWith('retraining');
+            const isMinor = state.track.startsWith('minor');
             const isYangseong = state.track.startsWith('yangseong');
 
-            // Gender, CPR, Aptitude
+            // Gender, CPR, Aptitude (Required for Yangseong and Minor, NOT for Retraining)
             const genderSec = document.getElementById('section-gender');
             const cprSec = document.getElementById('section-cpr');
             const aptSec = document.getElementById('section-apt');
@@ -1854,6 +1855,7 @@
                 if (cprSec) cprSec.classList.add('hidden');
                 if (aptSec) aptSec.classList.add('hidden');
             } else {
+                // Yangseong and Minor show these
                 if (genderSec) genderSec.classList.remove('hidden');
                 if (cprSec) cprSec.classList.remove('hidden');
                 if (aptSec) aptSec.classList.remove('hidden');
@@ -2355,6 +2357,9 @@
 
             // 4. Extras Check
             const isRetraining = state.track.startsWith('retraining');
+            const isMinor = state.track.startsWith('minor');
+            const isYangseong = state.track.startsWith('yangseong');
+
             const checks = {
                 gender: isRetraining || (document.getElementById('check-gender1').checked && document.getElementById('check-gender2').checked),
                 ethics: document.getElementById('check-ethics').checked,
@@ -2362,9 +2367,10 @@
                 apt: isRetraining || (document.getElementById('check-apt1').checked && document.getElementById('check-apt2').checked),
                 exam: document.getElementById('exam-edu').checked && document.getElementById('exam-tecedu').checked &&
                     document.getElementById('exam-construct').checked && document.getElementById('exam-elec').checked,
-                eduPractice: !state.track.startsWith('yangseong') ||
+                eduPractice: isYangseong ?
                     ((document.getElementById('check-edu-service-na').checked || document.getElementById('check-edu-service-60').checked) &&
                         (document.getElementById('check-teaching-practice-na').checked || document.getElementById('check-teaching-practice-1').checked))
+                    : true // Retraining and Minor don't need this
             };
 
             // 5. Paper Steps Check
@@ -2597,7 +2603,7 @@
                             </div>
                         </div>
                         <div class="requirement-content" onclick="event.stopPropagation()">
-                            <div class="credit-summary-grid" style="margin-top: 1.5rem;">
+                            <div class="credit-summary-grid" style="margin-top: 1.5rem; ${trackInfo.edu === 0 ? 'grid-template-columns: repeat(2, 1fr);' : ''}">
                                 <!-- Total Credits -->
                                 <div class="credit-card highlight">
                                     <span class="credit-card-label">전체 학점</span>
@@ -2615,16 +2621,18 @@
                                     </div>
                                 </div>
                                 <!-- Edu Credits -->
-                                <div class="credit-card" style="${trackInfo.edu === 0 ? 'opacity: 0.5;' : ''}">
+                                ${trackInfo.edu > 0 ? `
+                                <div class="credit-card">
                                     <span class="credit-card-label">교직 학점</span>
                                     <div class="credit-card-value">${totalEdu} <span class="credit-card-target">/ ${trackInfo.edu}</span></div>
                                     <div class="credit-progress-bg">
                                         <div class="credit-progress-bar" style="width: ${eduPct}%; background: #7c3aed;"></div>
                                     </div>
                                 </div>
+                                ` : ''}
                             </div>
 
-                            ${!isRetraining ? `
+                            ${(isYangseong || isMinor) ? `
                             <div style="margin-bottom: 1.5rem;">
                                 <strong style="font-size: 0.85rem; display: block; margin-bottom: 0.75rem; color: var(--text-main);">기본이수 및 교과교육 영역 현황</strong>
                                 <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px;">
@@ -2750,7 +2758,8 @@
                                         </div>
                                     </div>
 
-                                    <!-- 교직 과목 (Shown for Non-Retraining) -->
+                                    <!-- 교직 과목 (Shown for Non-Retraining if edu > 0) -->
+                                    ${trackInfo.edu > 0 ? `
                                     <div style="padding: 1.25rem; background: #f5f3ff; border: 1px solid #ddd6fe; border-radius: 12px;">
                                         <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 0.5rem; color: #5b21b6;">
                                             <i data-lucide="user-check" style="width: 16px;"></i>
@@ -2760,6 +2769,7 @@
                                             ${Array.from(uniqueCourses).filter(c => CONFIG.edu_subjects.includes(c)).map(c => `<span style="font-size: 0.7rem; background: white; padding: 2px 6px; border-radius: 4px; border: 1px solid #ddd6fe; color: #5b21b6;">${c}</span>`).join('')}
                                         </div>
                                     </div>
+                                    ` : ''}
                                     
                                     ` : `
                                     <!-- Simplified list for Retraining Tracks -->
@@ -2773,6 +2783,7 @@
                                         </div>
                                     </div>
 
+                                    ${trackInfo.edu > 0 ? `
                                     <div style="padding: 1.25rem; background: #f5f3ff; border: 1px solid #ddd6fe; border-radius: 12px;">
                                         <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 1rem; color: #5b21b6; border-bottom: 1px solid #ede9fe; padding-bottom: 0.5rem;">
                                             <i data-lucide="layers" style="width: 18px;"></i>
@@ -2782,6 +2793,7 @@
                                             ${Array.from(uniqueCourses).filter(c => CONFIG.edu_subjects.includes(c)).map(c => `<span style="font-size: 0.75rem; background: white; padding: 4px 10px; border-radius: 8px; border: 1px solid #ddd6fe; color: #5b21b6; font-weight: 600;">${c}</span>`).join('')}
                                         </div>
                                     </div>
+                                    ` : ''}
                                     `}
 
                                 </div>
