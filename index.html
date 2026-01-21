@@ -2810,11 +2810,11 @@
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
             } else {
                 const unmet = finalRequirements.filter(r => !r.pass);
-                const unmetLinks = unmet.map(r => `<span style="cursor:pointer; text-decoration:underline; font-weight:700; color:#ef4444; margin: 0 5px;" onclick="scrollToRequirement(${r.displayId})">졸업요건${r.displayId} 미충족</span>`).join(', ');
+                const unmetLinks = unmet.map(r => `<span style="cursor:pointer; text-decoration:underline; font-weight:700; color:#ef4444; white-space: nowrap;" onclick="scrollToRequirement(${r.displayId})">졸업요건${r.displayId} 미충족</span>`).join('<span style="color:#cbd5e1; margin: 0 8px;">|</span>');
 
                 finalStatus.innerHTML = `
                     <div style="margin-bottom: 12px;">졸업 요건 미충족</div>
-                    <div style="font-size: 0.95rem; background: rgba(255,255,255,0.5); padding: 10px; border-radius: 10px;">
+                    <div style="font-size: 0.95rem; background: rgba(255,255,255,0.5); padding: 12px; border-radius: 12px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; line-height: 1.8;">
                         ${unmetLinks}
                     </div>
                 `;
