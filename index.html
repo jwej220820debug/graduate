@@ -2545,17 +2545,17 @@
             const isMinorResult = state.track.startsWith('minor');
 
             const finalRequirements = requirements.filter(r => {
+                // For Retraining: Hide 2(Gender), 4(CPR), 5(Aptitude), 7(Education Practice)
                 if (isRetraining) {
-                    // Hide 2(Gender), 4(CPR), 5(Aptitude) for retraining
-                    if (r.id === 2 || r.id === 4 || r.id === 5) return false;
+                    if (r.id === 2 || r.id === 4 || r.id === 5 || r.id === 7) return false;
                 }
 
-                // Education Practice (Req 7) is ONLY for Yangseong tracks
-                if (r.id === 7) {
-                    if (isYangseongResult) return true;
+                // For Minor: Hide 2(Gender), 4(CPR), 5(Aptitude) are shown, but 7(Education Practice) is hidden
+                if (isMinorResult && r.id === 7) {
                     return false;
                 }
 
+                // For Yangseong: Show all requirements including 7(Education Practice)
                 return true;
             }).map((r, idx) => {
                 const newId = idx + 1;
