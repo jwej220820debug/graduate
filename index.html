@@ -967,6 +967,34 @@
             font-weight: 400;
         }
 
+        /* High Visibility for Total Credit Card */
+        .credit-card.highlight {
+            border: 2px solid var(--primary);
+            background: linear-gradient(to bottom right, #ffffff, var(--primary-light));
+            transform: scale(1.02);
+            box-shadow: var(--shadow-md);
+            z-index: 10;
+        }
+
+        .credit-card.highlight .credit-card-label {
+            color: var(--primary);
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .credit-card.highlight .credit-card-value {
+            font-size: 1.8rem;
+            /* Significantly larger */
+        }
+
+        .credit-card.highlight .credit-card-target {
+            font-size: 1rem;
+        }
+
+        .credit-card.highlight .credit-progress-bg {
+            height: 8px;
+        }
+
         .credit-progress-bg {
             height: 6px;
             background: #e2e8f0;
@@ -1227,7 +1255,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="credit-card" id="card-total-credits">
+                <div class="credit-card highlight" id="card-total-credits">
                     <div class="credit-card-label">실시간 전체 이수</div>
                     <div class="credit-card-value">
                         <span id="total-curr" class="credit-text-red">0</span>
