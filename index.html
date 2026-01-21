@@ -1207,9 +1207,10 @@
                 </div>
                 <div class="stat-card">
                     <div class="stat-label">필수 요건 충족 (기본 5 + 교과 1)</div>
-                    <div class="stat-value"><span id="curr-areas">0</span><span
-                            style="font-size: 1rem; color: var(--text-muted);">/6</span></div>
-                    <div id="area-status" class="status-pill status-fail">미비</div>
+                    <div class="stat-value"><span id="curr-areas">${areasDisplayCount}</span><span
+                            style="font-size: 1rem; color: var(--text-muted);">/${areasDisplayTarget}</span></div>
+                    <div id="area-status" class="status-pill ${areasPass ? 'status-pass' : 'status-fail'}">${areasPass ?
+                        '충족' : '미비'}</div>
                 </div>
             </div>
 
@@ -1237,8 +1238,8 @@
                 yangseong_thesis: { name: '양성 과정 (학위논문) - 24학점', total: 24, major: 20, edu: 4, semesters: 4, type: 'thesis' },
                 minor_report: { name: '부전공 과정 (무논문 연구보고서)', total: 30, major: 30, edu: 0, semesters: 5, type: 'report' },
                 minor_thesis: { name: '부전공 과정 (학위논문)', total: 30, major: 30, edu: 0, semesters: 5, type: 'thesis' },
-                retraining_report: { name: '재교육 과정 (무논문 연구보고서)', total: 30, major: 30, edu: 0, semesters: 5, type: 'report' },
-                retraining_thesis: { name: '재교육 과정 (학위논문)', total: 30, major: 30, edu: 0, semesters: 5, type: 'thesis' }
+                retraining_report: { name: '재교육 과정 (무논문 연구보고서)', total: 30, major: 24, edu: 6, semesters: 5, type: 'report' },
+                retraining_thesis: { name: '재교육 과정 (학위논문)', total: 24, major: 20, edu: 4, semesters: 4, type: 'thesis' }
             },
             areas: [
                 { id: 'area_2', name: '제조기술', subjects: ['제조기술'] },
@@ -1685,11 +1686,12 @@
             let satisfiedEssentials = CONFIG.essentials.filter(e => uniqueCourses.has(e));
 
             // 4. Extras Check
+            const isRetraining = state.track.startsWith('retraining');
             const checks = {
-                gender: document.getElementById('check-gender1').checked && document.getElementById('check-gender2').checked,
+                gender: isRetraining || (document.getElementById('check-gender1').checked && document.getElementById('check-gender2').checked),
                 ethics: document.getElementById('check-ethics').checked,
-                cpr: document.getElementById('check-cpr1').checked && document.getElementById('check-cpr2').checked,
-                apt: document.getElementById('check-apt1').checked && document.getElementById('check-apt2').checked,
+                cpr: isRetraining || (document.getElementById('check-cpr1').checked && document.getElementById('check-cpr2').checked),
+                apt: isRetraining || (document.getElementById('check-apt1').checked && document.getElementById('check-apt2').checked),
                 exam: document.getElementById('exam-edu').checked && document.getElementById('exam-tecedu').checked &&
                     document.getElementById('exam-construct').checked && document.getElementById('exam-elec').checked
             };
@@ -1704,7 +1706,11 @@
             const basicAreasCount = satisfiedAreas.size;
             const essentialPass = CONFIG.essentials.every(e => uniqueCourses.has(e));
             const totalRequirementsCount = basicAreasCount + (essentialPass ? 1 : 0);
-            const areasPass = totalRequirementsCount === 6;
+
+            // Retraining tracks do not need area checks
+            const areasPass = isRetraining ? true : totalRequirementsCount === 6;
+            const areasDisplayCount = isRetraining ? "-" : totalRequirementsCount;
+            const areasDisplayTarget = isRetraining ? "-" : "6";
 
             // Requirement 1 Pass condition: Both Credits AND Areas must be met
             const req1Pass = creditPass && areasPass;
