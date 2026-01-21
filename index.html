@@ -181,15 +181,14 @@
         }
 
         .step-label {
-            position: absolute;
-            top: 50px;
-            left: 50%;
-            transform: translateX(-50%);
+            margin-top: 10px;
             white-space: nowrap;
             font-size: 0.75rem;
             font-weight: 600;
             color: var(--text-muted);
             transition: color 0.3s;
+            pointer-events: none;
+            /* Let the container handle clicks */
         }
 
         .step-container {
@@ -198,6 +197,9 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            flex: 1;
+            /* Ensure equal spacing and larger click area */
+            cursor: pointer;
         }
 
         .step {
@@ -212,6 +214,8 @@
             border: 2px solid var(--border);
             color: var(--text-muted);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+            /* Let the container handle clicks */
         }
 
         .step-container.active .step {
@@ -998,15 +1002,15 @@
         </header>
 
         <div class="steps">
-            <div class="step-container active" id="step-cont-1" onclick="goToStep(1)" style="cursor: pointer;">
+            <div class="step-container active" id="step-cont-1" onclick="goToStep(1)">
                 <div class="step" id="step-dot-1"><span>1</span></div>
                 <div class="step-label">정보 입력</div>
             </div>
-            <div class="step-container" id="step-cont-2" onclick="goToStep(2)" style="cursor: pointer;">
+            <div class="step-container" id="step-cont-2" onclick="goToStep(2)">
                 <div class="step" id="step-dot-2"><span>2</span></div>
                 <div class="step-label">이수 현황</div>
             </div>
-            <div class="step-container" id="step-cont-3" onclick="goToStep(3)" style="cursor: pointer;">
+            <div class="step-container" id="step-cont-3" onclick="goToStep(3)">
                 <div class="step" id="step-dot-3"><span>3</span></div>
                 <div class="step-label">사정 결과</div>
             </div>
@@ -1966,6 +1970,13 @@
             if (!saved) return;
             const data = JSON.parse(saved);
 
+            // If track changed, we ONLY load identity but SKIP courses and progress to avoid inconsistency
+            const trackMismatch = data.track && data.track !== state.track;
+            if (trackMismatch) {
+                console.log('Saved data is for a different track. Starting fresh for:', state.track);
+                return; // Do not load courses, checks, or progress from a different track
+            }
+
             // Hydrate Recognition
             if (data.recognition) {
                 data.recognition.forEach(areaId => {
@@ -1988,13 +1999,6 @@
                 }
 
                 // Fill inputs
-                data.courses.forEach((item) => {
-                    const input = document.querySelector(`.course-input[data-sem="${item.sem}"]:not([value])`);
-                    // This logic for filling is a bit tricky if there are multiple inputs per sem.
-                    // Let's use a more robust way.
-                });
-
-                // Robust version:
                 const semMap = {};
                 data.courses.forEach(item => {
                     if (!semMap[item.sem]) semMap[item.sem] = [];
@@ -2012,27 +2016,27 @@
 
             // Hydrate Checks
             if (data.checks) {
-                document.getElementById('check-gender1').checked = data.checks.gender1;
-                document.getElementById('check-gender2').checked = data.checks.gender2;
-                document.getElementById('check-ethics').checked = data.checks.ethics;
-                document.getElementById('check-cpr1').checked = data.checks.cpr1;
-                document.getElementById('check-cpr2').checked = data.checks.cpr2;
-                document.getElementById('check-apt1').checked = data.checks.apt1;
-                document.getElementById('check-apt2').checked = data.checks.apt2;
-                document.getElementById('exam-edu').checked = data.checks.examEdu;
-                document.getElementById('exam-tecedu').checked = data.checks.examTec;
-                document.getElementById('exam-construct').checked = data.checks.examCon;
-                document.getElementById('exam-elec').checked = data.checks.examElec;
-                if (data.checks.eduServiceNA !== undefined) document.getElementById('check-edu-service-na').checked = data.checks.eduServiceNA;
-                if (data.checks.eduService60 !== undefined) document.getElementById('check-edu-service-60').checked = data.checks.eduService60;
-                if (data.checks.teachingPracticeNA !== undefined) document.getElementById('check-teaching-practice-na').checked = data.checks.teachingPracticeNA;
-                if (data.checks.teachingPractice1 !== undefined) document.getElementById('check-teaching-practice-1').checked = data.checks.teachingPractice1;
+                document.getElementById('check-gender1').checked = !!data.checks.gender1;
+                document.getElementById('check-gender2').checked = !!data.checks.gender2;
+                document.getElementById('check-ethics').checked = !!data.checks.ethics;
+                document.getElementById('check-cpr1').checked = !!data.checks.cpr1;
+                document.getElementById('check-cpr2').checked = !!data.checks.cpr2;
+                document.getElementById('check-apt1').checked = !!data.checks.apt1;
+                document.getElementById('check-apt2').checked = !!data.checks.apt2;
+                document.getElementById('exam-edu').checked = !!data.checks.examEdu;
+                document.getElementById('exam-tecedu').checked = !!data.checks.examTec;
+                document.getElementById('exam-construct').checked = !!data.checks.examCon;
+                document.getElementById('exam-elec').checked = !!data.checks.examElec;
+                if (data.checks.eduServiceNA !== undefined) document.getElementById('check-edu-service-na').checked = !!data.checks.eduServiceNA;
+                if (data.checks.eduService60 !== undefined) document.getElementById('check-edu-service-60').checked = !!data.checks.eduService60;
+                if (data.checks.teachingPracticeNA !== undefined) document.getElementById('check-teaching-practice-na').checked = !!data.checks.teachingPracticeNA;
+                if (data.checks.teachingPractice1 !== undefined) document.getElementById('check-teaching-practice-1').checked = !!data.checks.teachingPractice1;
             }
 
             if (data.paperSteps) {
                 const pSteps = document.querySelectorAll('#paper-checklist input');
                 data.paperSteps.forEach((val, idx) => {
-                    if (pSteps[idx]) pSteps[idx].checked = val;
+                    if (pSteps[idx]) pSteps[idx].checked = !!val;
                 });
             }
 
