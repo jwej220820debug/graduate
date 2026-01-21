@@ -1594,27 +1594,55 @@
             const paperType = trackInfo.type;
             document.getElementById('paper-type-label').innerText = paperType === 'thesis' ? '학위논문' : '무논문 연구보고서';
             const paperSteps = document.getElementById('paper-checklist');
+
+            const createPaperItem = (id, label, link = null) => {
+                const linkHtml = link ? ` <a href="${link}" target="_blank" class="guide-link" style="padding: 2px 6px; font-size: 0.7rem; margin-left: 5px;" onclick="event.stopPropagation()">안내</a>` : '';
+                return `<label class="checkbox-container">${label}${linkHtml}<input type="checkbox" id="paper-step${id}" onchange="saveData()"><span class="checkmark"></span></label>`;
+            };
+
+            const thesisLinks = {
+                apply: "https://egc.cnu.ac.kr/egc/board/notice.do?mode=view&articleNo=554634&article.offset=0&articleLimit=15&srSearchVal=%EC%A7%80%EB%8F%84%EA%B5%90%EC%88%98",
+                receipt: "https://egc.cnu.ac.kr/egc/board/notice.do?mode=view&articleNo=561807&article.offset=0&articleLimit=15&srSearchVal=%EB%AC%B4%EB%85%BC%EB%AC%B8",
+                license: "https://egc.cnu.ac.kr/egc/board/notice.do?mode=view&articleNo=561820&article.offset=0&articleLimit=15&srSearchVal=%EB%AC%B4%EB%85%BC%EB%AC%B8",
+                exam: "https://egc.cnu.ac.kr/egc/board/notice.do?mode=view&articleNo=564990&article.offset=0&articleLimit=15&srSearchVal=%EB%AC%B4%EB%85%BC%EB%AC%B8",
+                final: "https://egc.cnu.ac.kr/egc/board/notice.do?mode=view&articleNo=564990&article.offset=0&articleLimit=15&srSearchVal=%EB%AC%B4%EB%85%BC%EB%AC%B8"
+            };
+
+            const reportLinks = {
+                apply: "https://egc.cnu.ac.kr/egc/board/notice.do?mode=view&articleNo=554634&article.offset=0&articleLimit=15&srSearchVal=%EC%A7%80%EB%8F%84%EA%B5%90%EC%88%98",
+                receipt: "https://egc.cnu.ac.kr/egc/board/notice.do?mode=view&articleNo=561812&article.offset=0&articleLimit=15&srSearchVal=%EB%AC%B4%EB%85%BC%EB%AC%B8",
+                license: "https://egc.cnu.ac.kr/egc/board/notice.do?mode=view&articleNo=561820&article.offset=0&articleLimit=15&srSearchVal=%EB%AC%B4%EB%85%BC%EB%AC%B8",
+                exam: "https://egc.cnu.ac.kr/egc/board/notice.do?mode=view&articleNo=564990&article.offset=0&articleLimit=15&srSearchVal=%EB%AC%B4%EB%85%BC%EB%AC%B8",
+                binding: "https://egc.cnu.ac.kr/egc/board/notice.do?mode=view&articleNo=574383&article.offset=0&articleLimit=15&srSearchVal=%EB%AC%B4%EB%85%BC%EB%AC%B8"
+            };
+
             if (paperType === 'report') {
-                paperSteps.innerHTML = `
-                <label class="checkbox-container">지도교수 신청<input type="checkbox" id="paper-step1" onchange="saveData()"><span class="checkmark"></span></label>
-                <label class="checkbox-container">연구 주제 선정<input type="checkbox" id="paper-step2" onchange="saveData()"><span class="checkmark"></span></label>
-                <label class="checkbox-container">보고서 작성 완료<input type="checkbox" id="paper-step3" onchange="saveData()"><span class="checkmark"></span></label>
-                <label class="checkbox-container">예비심사 통과<input type="checkbox" id="paper-step4" onchange="saveData()"><span class="checkmark"></span></label>
-                <label class="checkbox-container">결과심사 통과<input type="checkbox" id="paper-step5" onchange="saveData()"><span class="checkmark"></span></label>
-                <label class="checkbox-container">소프트제본 제출<input type="checkbox" id="paper-step6" onchange="saveData()"><span class="checkmark"></span></label>
-            `;
+                paperSteps.innerHTML = [
+                    createPaperItem(1, "지도교수 선정", reportLinks.apply),
+                    createPaperItem(2, "보고서 주제 선정"),
+                    createPaperItem(3, "접수", reportLinks.receipt),
+                    createPaperItem(4, "교원자격무시험검정원서 제출", reportLinks.license),
+                    createPaperItem(5, "예비심사 통과", reportLinks.exam),
+                    createPaperItem(6, "본심사 통과", reportLinks.exam),
+                    createPaperItem(7, "소프트커버 제본 제출", reportLinks.binding)
+                ].join('');
             } else {
-                paperSteps.innerHTML = `
-                <label class="checkbox-container">지도교수 신청<input type="checkbox" id="paper-step1" onchange="saveData()"><span class="checkmark"></span></label>
-                <label class="checkbox-container">논문 주제 선정<input type="checkbox" id="paper-step2" onchange="saveData()"><span class="checkmark"></span></label>
-                <label class="checkbox-container">예비/결과 심사 통과<input type="checkbox" id="paper-step3" onchange="saveData()"><span class="checkmark"></span></label>
-                <label class="checkbox-container">인준서 PDF/원본 제출<input type="checkbox" id="paper-step4" onchange="saveData()"><span class="checkmark"></span></label>
-                <label class="checkbox-container">표절검사 결과 제출<input type="checkbox" id="paper-step5" onchange="saveData()"><span class="checkmark"></span></label>
-                <label class="checkbox-container">dcollection 온라인 제출<input type="checkbox" id="paper-step6" onchange="saveData()"><span class="checkmark"></span></label>
-                <label class="checkbox-container">통합정보시스템 업로드<input type="checkbox" id="paper-step7" onchange="saveData()"><span class="checkmark"></span></label>
-                <label class="checkbox-container">저작권 서류 제출<input type="checkbox" id="paper-step8" onchange="saveData()"><span class="checkmark"></span></label>
-            `;
+                paperSteps.innerHTML = [
+                    createPaperItem(1, "지도교수 신청", thesisLinks.apply),
+                    createPaperItem(2, "논문 주제 선정"),
+                    createPaperItem(3, "접수", thesisLinks.receipt),
+                    createPaperItem(4, "교원자격무시험검정원서 제출", thesisLinks.license),
+                    createPaperItem(5, "예비심사 통과", thesisLinks.exam),
+                    createPaperItem(6, "본심사 통과", thesisLinks.exam),
+                    createPaperItem(7, "원본파일(pdf) 제출", thesisLinks.final),
+                    createPaperItem(8, "인준서 원본 제출", thesisLinks.final),
+                    createPaperItem(9, "학위논문제출확인서 제출", thesisLinks.final),
+                    createPaperItem(10, "표절 검사 제출", thesisLinks.final),
+                    createPaperItem(11, "통합정보시스템 업로드", thesisLinks.final),
+                    createPaperItem(12, "원문 파일 제출", thesisLinks.final)
+                ].join('');
             }
+
 
             // Other requirements auto-save
             document.querySelectorAll('#step-2 input[type="checkbox"]').forEach(chk => {
@@ -2243,7 +2271,9 @@
                     title: `졸업요건8. ${paperLabel}`,
                     pass: paperDone,
                     items: Array.from(document.querySelectorAll('#paper-checklist input')).map((input, idx) => {
-                        return { text: input.parentElement.innerText.trim(), pass: input.checked };
+                        const tempLabel = input.parentElement.cloneNode(true);
+                        tempLabel.querySelectorAll('a, input, span').forEach(el => el.remove());
+                        return { text: tempLabel.innerText.trim(), pass: input.checked };
                     })
                 }
             ];
