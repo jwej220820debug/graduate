@@ -1432,13 +1432,24 @@
             const currentTrack = state.track;
             if (currentTrack && !currentTrack.startsWith(group)) {
                 state.track = '';
+                state.maxReachedStep = 1; // Reset progress when track category changes
                 document.getElementById('selected-track').value = '';
                 document.querySelectorAll('.radio-box').forEach(box => box.classList.remove('selected'));
+                // Remove 'done' markers from header
+                document.querySelectorAll('.step-container').forEach((el, idx) => {
+                    if (idx > 0) el.classList.remove('done');
+                });
             }
         }
 
         function selectTrack(trackId) {
-            state.track = trackId;
+            if (state.track !== trackId) {
+                state.track = trackId;
+                state.maxReachedStep = 1; // Reset progress when specific track changes
+                document.querySelectorAll('.step-container').forEach((el, idx) => {
+                    if (idx > 0) el.classList.remove('done');
+                });
+            }
             document.querySelectorAll('.radio-box').forEach(box => box.classList.remove('selected'));
             const selectedBox = document.querySelector(`.radio-box[data-track="${trackId}"]`);
             if (selectedBox) selectedBox.classList.add('selected');
@@ -1465,6 +1476,14 @@
                 }
                 if (!name) { alert('이름을 입력하세요'); return false; }
                 if (!track) { alert('과정을 선택하세요'); return false; }
+
+                // If user identity changed, reset session progress
+                if (state.studentId && (state.studentId !== sid || state.name !== name)) {
+                    state.maxReachedStep = 1;
+                    document.querySelectorAll('.step-container').forEach((el, idx) => {
+                        if (idx > 0) el.classList.remove('done');
+                    });
+                }
 
                 state.studentId = sid;
                 state.name = name;
@@ -1531,6 +1550,11 @@
         function initStep2() {
             const trackInfo = CONFIG.tracks[state.track];
             state.extraSemesters = 0; // Reset extra semesters
+
+            // Clear all checkboxes in Step 2 to prevent state bleed
+            document.querySelectorAll('#step-2 input[type="checkbox"]').forEach(chk => {
+                chk.checked = false;
+            });
 
             // Recognition logic (Only for yangseong)
             const recArea = document.getElementById('recognition-area');
