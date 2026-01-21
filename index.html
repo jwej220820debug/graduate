@@ -2532,6 +2532,7 @@
                 return true;
             }).map((r, idx) => {
                 const newId = idx + 1;
+                r.displayId = newId;
                 r.title = r.title.replace(/졸업요건\d+/, `졸업요건${newId}`);
                 return r;
             });
@@ -2556,7 +2557,7 @@
                     const eduPct = trackInfo.edu > 0 ? Math.min(100, (totalEdu / trackInfo.edu) * 100) : 100;
 
                     return `
-                    <div class="requirement-card ${!req.pass ? 'open' : ''}" onclick="this.classList.toggle('open')">
+                    <div class="requirement-card ${!req.pass ? 'open' : ''}" id="result-req-${req.displayId}" onclick="this.classList.toggle('open')">
                         <div class="requirement-header">
                             <div class="requirement-title">
                                 <i data-lucide="${req.pass ? 'check-circle' : 'alert-circle'}" 
@@ -2770,7 +2771,7 @@
 
                 // Default rendering for other requirements
                 return `
-                <div class="requirement-card ${!req.pass ? 'open' : ''}" onclick="this.classList.toggle('open')">
+                <div class="requirement-card ${!req.pass ? 'open' : ''}" id="result-req-${req.displayId}" onclick="this.classList.toggle('open')">
                     <div class="requirement-header">
                         <div class="requirement-title">
                             <i data-lucide="${req.pass ? 'check-circle' : 'alert-circle'}" 
@@ -2808,9 +2809,34 @@
                 finalStatus.className = 'grad-possible';
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
             } else {
-                finalStatus.innerHTML = '<div style="margin-bottom: 10px;">졸업 요건 미충족</div><div style="font-size: 0.85rem; font-weight: 400;">미충족된 요건의 상세 내용을 확인하세요.</div>';
+                const unmet = finalRequirements.filter(r => !r.pass);
+                const unmetLinks = unmet.map(r => `<span style="cursor:pointer; text-decoration:underline; font-weight:700; color:#ef4444; margin: 0 5px;" onclick="scrollToRequirement(${r.displayId})">졸업요건${r.displayId} 미충족</span>`).join(', ');
+
+                finalStatus.innerHTML = `
+                    <div style="margin-bottom: 12px;">졸업 요건 미충족</div>
+                    <div style="font-size: 0.95rem; background: rgba(255,255,255,0.5); padding: 10px; border-radius: 10px;">
+                        ${unmetLinks}
+                    </div>
+                `;
                 finalStatus.className = 'grad-impossible';
             }
+
+            // Global scroll function
+            window.scrollToRequirement = function (id) {
+                const el = document.getElementById(`result-req-${id}`);
+                if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    // Highlight the card briefly
+                    el.style.boxShadow = '0 0 20px rgba(239, 68, 68, 0.4)';
+                    setTimeout(() => {
+                        el.style.boxShadow = '';
+                    }, 2000);
+                    // Open it if closed
+                    if (!el.classList.contains('open')) {
+                        el.classList.add('open');
+                    }
+                }
+            };
 
             lucide.createIcons();
         }
