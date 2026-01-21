@@ -2574,7 +2574,7 @@
                         <div class="requirement-content" onclick="event.stopPropagation()">
                             <div class="credit-summary-grid" style="margin-top: 1.5rem;">
                                 <!-- Total Credits -->
-                                <div class="credit-card">
+                                <div class="credit-card highlight">
                                     <span class="credit-card-label">전체 학점</span>
                                     <div class="credit-card-value">${totalCredits} <span class="credit-card-target">/ ${trackInfo.total}</span></div>
                                     <div class="credit-progress-bg">
@@ -2661,23 +2661,26 @@
                                             
                                             <!-- 미이수 -->
                                             <div>
-                                                <div style="font-size: 0.8rem; font-weight: 700; color: #991b1b; margin-bottom: 0.5rem;">⚠️ 미이수 현황</div>
-                                                <div style="display: flex; flex-direction: column; gap: 8px;">
+                                                <div style="font-size: 0.85rem; font-weight: 800; color: #dc2626; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 4px;">
+                                                    <i data-lucide="alert-triangle" style="width: 16px;"></i>
+                                                    미이수 현황
+                                                </div>
+                                                <div style="display: flex; flex-direction: column; gap: 12px;">
                                                     <div>
-                                                        <div style="font-size: 0.7rem; color: #991b1b; opacity: 0.8; margin-bottom: 4px;">미이수 영역</div>
-                                                        <div style="display: flex; flex-wrap: wrap; gap: 4px;">
-                                                            ${CONFIG.areas.filter(a => !satisfiedAreas.has(a.id)).map(a => `<span style="font-size: 0.7rem; background: #fef2f2; padding: 2px 6px; border-radius: 4px; border: 1px solid #fecdd3; color: #991b1b;">${a.name}</span>`).join('')}
+                                                        <div style="font-size: 0.75rem; color: #991b1b; font-weight: 700; margin-bottom: 6px;">🚩 미이수 영역</div>
+                                                        <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                                                            ${CONFIG.areas.filter(a => !satisfiedAreas.has(a.id)).map(a => `<span style="font-size: 0.85rem; background: #fee2e2; padding: 4px 10px; border-radius: 6px; border: 1.5px solid #ef4444; color: #b91c1c; font-weight: 800;">${a.name}</span>`).join('')}
                                                         </div>
                                                     </div>
                                                     <div>
-                                                        <div style="font-size: 0.7rem; color: #991b1b; opacity: 0.8; margin-bottom: 4px;">미이수 과목 (추천)</div>
-                                                        <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                                                        <div style="font-size: 0.75rem; color: #991b1b; font-weight: 700; margin-bottom: 6px;">💡 미이수 과목 (추천)</div>
+                                                        <div style="display: flex; flex-wrap: wrap; gap: 6px;">
                                                             ${CONFIG.areas.filter(a => !satisfiedAreas.has(a.id)).map(a => {
                             let recommend = a.subjects[0];
                             if (a.name === '통신 및 전기전자') recommend = '정보통신기술(or 전기전자기술)';
                             if (a.name === '수송 및 동력') recommend = '수송기술(or 동력 및 에너지기술)';
-                            return `<span style="font-size: 0.7rem; color: #7f1d1d;">${recommend}</span>`;
-                        }).join(', ')}
+                            return `<span style="font-size: 0.8rem; background: #fff7ed; padding: 4px 10px; border-radius: 6px; border: 1px dashed #f97316; color: #c2410c; font-weight: 600;">${recommend}</span>`;
+                        }).join('')}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -2700,9 +2703,12 @@
                                                 </div>
                                             </div>
                                             <div>
-                                                <div style="font-size: 0.8rem; font-weight: 700; color: #991b1b; margin-bottom: 0.5rem;">⚠️ 미이수 과목</div>
-                                                <div style="display: flex; flex-wrap: wrap; gap: 4px;">
-                                                    ${CONFIG.essentials.filter(e => !uniqueCourses.has(e)).map(e => `<span style="font-size: 0.7rem; background: #fef2f2; padding: 2px 6px; border-radius: 4px; border: 1px solid #fecdd3; color: #991b1b;">${e}</span>`).join('')}
+                                                <div style="font-size: 0.85rem; font-weight: 800; color: #dc2626; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 4px;">
+                                                    <i data-lucide="alert-circle" style="width: 16px;"></i>
+                                                    미이수 과목
+                                                </div>
+                                                <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                                                    ${CONFIG.essentials.filter(e => !uniqueCourses.has(e)).map(e => `<span style="font-size: 0.85rem; background: #fee2e2; padding: 4px 10px; border-radius: 6px; border: 1.5px solid #ef4444; color: #b91c1c; font-weight: 800;">${e}</span>`).join('')}
                                                 </div>
                                             </div>
                                         </div>
