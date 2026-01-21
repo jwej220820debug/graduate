@@ -908,8 +908,7 @@
         <datalist id="subject-datalist"></datalist>
         <header>
             <div class="logo-container" style="background: transparent; box-shadow: none;">
-                <img src="C:/Users/user/.gemini/antigravity/brain/ffcdf891-b2cc-4992-8030-30ce9abb1352/uploaded_image_1768960597888.png"
-                    alt="CNU Tech Ed Logo">
+                <img src="dept_logo.png" alt="CNU Tech Ed Logo">
             </div>
             <h1>기술교육전공 졸업사정</h1>
             <p class="subtitle">충남대학교 교육대학원 자가 진단 시스템</p>
@@ -1477,7 +1476,7 @@
             // Renumber requirements
             let reqNumber = 1;
             const allReqHeaders = [
-                { id: 'req-h1', text: '수업 및 학점', icon: 'book-open' },
+                { id: 'req-h1', text: '수업 및 학점', icon: 'book-open', guide: '042-821-5691' },
                 { id: 'req-h2', text: '성인지교육', icon: 'users', sectionId: 'check-gender1' },
                 { id: 'req-h3', text: '연구윤리', icon: 'shield-check' },
                 { id: 'req-h4', text: '심폐소생술', icon: 'heart-pulse', sectionId: 'check-cpr1' },
@@ -1497,7 +1496,20 @@
                 } else {
                     let label = h.text;
                     if (h.id === 'req-h7') label = document.getElementById('paper-type-label').innerText;
-                    el.innerHTML = `<i data-lucide="${h.icon}" style="vertical-align: middle;"></i> 졸업요건${reqNumber}. ${label}`;
+
+                    let guideHtml = h.guide ? `<a href="tel:${h.guide}" class="guide-link" style="margin-left:auto; font-size:0.75rem;"><i data-lucide="phone" style="width:12px;height:12px;"></i> 문의: ${h.guide}</a>` : '';
+
+                    el.innerHTML = `<i data-lucide="${h.icon}" style="vertical-align: middle;"></i> 졸업요건${reqNumber}. ${label}${guideHtml}`;
+
+                    // Since we added a link inside h3, let's adjust the wrapper div to align them
+                    el.parentElement.style.display = 'flex';
+                    el.parentElement.style.justifyContent = 'space-between';
+                    el.parentElement.style.alignItems = 'center';
+                    el.style.flex = '1';
+                    el.style.display = 'flex';
+                    el.style.alignItems = 'center';
+                    el.style.gap = '8px';
+
                     reqNumber++;
                 }
             });
