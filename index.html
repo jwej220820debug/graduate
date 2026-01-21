@@ -1204,10 +1204,39 @@
             <h2 id="step2-title" style="margin-bottom: 2.5rem; text-align: center; font-family: 'Outfit';">전공 및 교직 이수 현황
             </h2>
 
-            <div class="total-progress-badge" id="total-credit-progress-bar">
-                <div style="font-weight: 600; color: var(--text-main); font-size: 1.1rem;">실시간 총 이수 학점</div>
-                <div style="font-size: 1.25rem;" id="total-credit-status-text">
-                    <span class="credit-text-red">0</span> / <span class="credit-text-blue">30</span> 학점
+            <div class="credit-summary-grid" id="credit-summary-step2" style="margin-bottom: 2.5rem;">
+                <div class="credit-card" id="card-major-credits">
+                    <div class="credit-card-label">실시간 전공 이수</div>
+                    <div class="credit-card-value">
+                        <span id="major-curr" class="credit-text-red">0</span>
+                        <span class="credit-card-target">/ <span id="major-target">24</span> 학점</span>
+                    </div>
+                    <div class="credit-progress-bg">
+                        <div id="major-bar" class="credit-progress-bar" style="width: 0%; background-color: #059669;">
+                        </div>
+                    </div>
+                </div>
+                <div class="credit-card" id="card-edu-credits">
+                    <div class="credit-card-label">실시간 교직 이수</div>
+                    <div class="credit-card-value">
+                        <span id="edu-curr" class="credit-text-red">0</span>
+                        <span class="credit-card-target">/ <span id="edu-target">6</span> 학점</span>
+                    </div>
+                    <div class="credit-progress-bg">
+                        <div id="edu-bar" class="credit-progress-bar" style="width: 0%; background-color: #7c3aed;">
+                        </div>
+                    </div>
+                </div>
+                <div class="credit-card" id="card-total-credits">
+                    <div class="credit-card-label">실시간 전체 이수</div>
+                    <div class="credit-card-value">
+                        <span id="total-curr" class="credit-text-red">0</span>
+                        <span class="credit-card-target">/ <span id="total-target">30</span> 학점</span>
+                    </div>
+                    <div class="credit-progress-bg">
+                        <div id="total-bar" class="credit-progress-bar"
+                            style="width: 0%; background-color: var(--primary);"></div>
+                    </div>
                 </div>
             </div>
 
@@ -1895,12 +1924,23 @@
             const inputs = document.querySelectorAll('.course-input');
             const totals = {};
             let grandTotal = 0;
+            let majorTotal = 0;
+            let eduTotal = 0;
+
+            const eduSet = new Set(CONFIG.edu_subjects);
+
             inputs.forEach(input => {
                 const sem = input.getAttribute('data-sem');
                 if (!totals[sem]) totals[sem] = 0;
-                if (input.value.trim()) {
+                const val = input.value.trim();
+                if (val) {
                     totals[sem] += 2;
                     grandTotal += 2;
+                    if (eduSet.has(val)) {
+                        eduTotal += 2;
+                    } else {
+                        majorTotal += 2;
+                    }
                 }
             });
 
@@ -1909,21 +1949,46 @@
                 if (el) el.querySelector('span').innerText = totals[sem];
             }
 
-            // Update Grand Total in Step 2
-            const target = trackInfo.total;
-            const statusEl = document.getElementById('total-credit-status-text');
-            if (statusEl) {
-                const currentClass = grandTotal >= target ? 'credit-text-blue' : 'credit-text-red';
-                statusEl.innerHTML = `<span class="${currentClass}">${grandTotal}</span> / <span class="credit-text-blue">${target}</span> 학점`;
+            // Update Detailed Credits in Step 2
+            const majorTarget = trackInfo.major;
+            const eduTarget = trackInfo.edu;
+            const totalTarget = trackInfo.total;
+
+            const updateCard = (prefix, current, target) => {
+                const currEl = document.getElementById(`${prefix}-curr`);
+                const targetEl = document.getElementById(`${prefix}-target`);
+                const barEl = document.getElementById(`${prefix}-bar`);
+                if (currEl) {
+                    currEl.innerText = current;
+                    currEl.className = current >= target ? 'credit-text-blue' : 'credit-text-red';
+                }
+                if (targetEl) targetEl.innerText = target;
+                if (barEl) {
+                    const percent = target > 0 ? Math.min(100, (current / target) * 100) : 100;
+                    barEl.style.width = `${percent}%`;
+                }
+            };
+
+            updateCard('major', majorTotal, majorTarget);
+            updateCard('edu', eduTotal, eduTarget);
+            updateCard('total', grandTotal, totalTarget);
+
+            // Hide/Show Teaching card if target is 0 (Minor tracks)
+            const eduCard = document.getElementById('card-edu-credits');
+            if (eduCard) {
+                eduCard.style.display = eduTarget === 0 ? 'none' : 'flex';
+                // Adjust grid template columns if 2 items
+                const grid = document.getElementById('credit-summary-step2');
+                if (grid) {
+                    grid.style.gridTemplateColumns = eduTarget === 0 ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)';
+                }
             }
 
-            // Show 'Add Extra Semester' button only if credits < target
+            // Show 'Add Extra Semester' button only if credits < totalTarget
             const btnContainer = document.getElementById('extra-semester-btn-container');
-            if (grandTotal < target) {
+            if (grandTotal < totalTarget) {
                 btnContainer.classList.remove('hidden');
             } else {
-                // We keep it if they already added some, but maybe better to keep it visible if they want to add more?
-                // The requirement says "if 24/30 is not met, show button".
                 btnContainer.classList.remove('hidden');
             }
         }
@@ -2290,12 +2355,13 @@
             // But since we are using innerHTML for the dashboard, we should ensure the initial injection is correct.
             const dashboardContainer = document.querySelector('.result-dashboard');
             if (isRetraining) {
+                const creditDisplay = `${trackInfo.major}+${trackInfo.edu}`;
                 dashboardContainer.innerHTML = `
                     <div class="stat-card" style="grid-column: span 2;">
-                        <div class="stat-label">이수 학점 (기준: <span id="req-credits">${trackInfo.total}</span>)</div>
+                        <div class="stat-label">이수 학점 (기준: <span id="req-credits">${creditDisplay}</span>)</div>
                         <div class="stat-value"><span id="curr-credits">${totalCredits}</span></div>
                         <div id="credit-status" class="status-pill ${creditPass ? 'status-pass' : 'status-fail'}">${creditPass ? '이수 완료' : (hasDuplicate ? '과목 중복' : '미충족')}</div>
-                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 10px;">* 재교육 과정은 별도의 기본이수/교과교육 영역 조건 없이 총 이수 학점만 충족하면 됩니다.</p>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 10px;">* 재교육 과정은 전공(${trackInfo.major}) 및 교직(${trackInfo.edu}) 학점을 각각 충족해야 하며, 별도의 기본이수/교과교육 영역 조건은 없습니다.</p>
                     </div>
                 `;
             } else {
