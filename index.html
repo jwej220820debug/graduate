@@ -1941,11 +1941,17 @@
 
             const paperLabel = trackInfo.type === 'thesis' ? '학위논문' : '연구보고서';
 
+            const creditDist = trackInfo.edu > 0
+                ? `(전공 ${trackInfo.major} + 교직 ${trackInfo.edu})`
+                : `(전공 ${trackInfo.major})`;
+
             const requirements = [
                 {
                     id: 1,
-                    title: "졸업요건1. 수업 및 학점",
+                    title: `졸업요건1. 수업 및 학점 ${creditDist}`,
                     pass: req1Pass,
+                    guide: "tel:042-821-5691",
+                    guideText: "문의: 042-821-5691 (기술교육과 사무실)",
                     items: [
                         { text: `전체 ${trackInfo.total}학점 중 ${totalCredits}학점 이수`, pass: totalCredits >= trackInfo.total, type: 'total' },
                         { text: `전공(일반/기본) ${trackInfo.major}학점 중 ${totalMajor}학점 이수`, pass: totalMajor >= trackInfo.major, type: 'major' },
@@ -2060,7 +2066,10 @@
                         <div class="requirement-title">
                             <i data-lucide="${req.pass ? 'check-circle' : 'alert-circle'}" 
                                class="${req.pass ? 'color-basic' : 'color-danger'}" style="width: 20px;"></i>
-                            ${req.title}
+                            <div style="display: flex; flex-direction: column;">
+                                <span>${req.title}</span>
+                                ${req.guideText ? `<a href="${req.guide}" class="guide-link" style="margin-left:0; font-size: 0.75rem;"><i data-lucide="phone" style="width:12px;height:12px;"></i> ${req.guideText}</a>` : ''}
+                            </div>
                         </div>
                         <div class="requirement-status">
                             <span class="status-pill ${req.pass ? 'status-pass' : 'status-fail'}">${req.pass ? '충족' : '미충족'}</span>
