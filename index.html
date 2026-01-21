@@ -2296,23 +2296,94 @@
                             ` : ''}
 
                             <div style="margin-top: 1.5rem; border-top: 1px solid #f1f5f9; padding-top: 1rem;">
-                                <button class="btn btn-secondary" style="width: 100%; justify-content: space-between; font-size: 0.85rem;" onclick="this.nextElementSibling.classList.toggle('hidden')">
-                                    <span>이수 과목 상세 내역 (전공/기본이수/교과교육)</span>
+                                <button class="btn btn-secondary" style="width: 100%; justify-content: space-between; font-size: 0.85rem;" onclick="this.nextElementSibling.classList.toggle('hidden'); lucide.createIcons();">
+                                    <span>이수 과목 상세 사정 내역</span>
                                     <i data-lucide="chevron-down"></i>
                                 </button>
-                                <div class="hidden" style="margin-top: 1rem; padding: 1rem; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;">
-                                    <div style="margin-bottom: 1rem;">
-                                        <h4 style="font-size: 0.85rem; margin-bottom: 0.5rem; color: #059669;">✅ 이수 완료 공통/전공 과목</h4>
-                                        <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-                                            ${Array.from(uniqueCourses).map(c => `<span style="font-size: 0.75rem; background: white; padding: 4px 8px; border-radius: 6px; border: 1px solid #dcfce7; color: #166534;">${c}</span>`).join('')}
+                                <div class="hidden" style="margin-top: 1rem; display: flex; flex-direction: column; gap: 1rem;">
+                                    
+                                    <!-- 전공 - 기본이수 영역 -->
+                                    <div style="padding: 1.25rem; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px;">
+                                        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 1rem; color: #166534; border-bottom: 1px solid #dcfce7; padding-bottom: 0.5rem;">
+                                            <i data-lucide="book" style="width: 18px;"></i>
+                                            <h4 style="font-size: 0.95rem; font-weight: 700;">전공 - 기본이수 영역</h4>
+                                        </div>
+                                        
+                                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                            <!-- 이수 완료 -->
+                                            <div>
+                                                <div style="font-size: 0.8rem; font-weight: 700; color: #166534; margin-bottom: 0.5rem;">✅ 이수 완료</div>
+                                                <div style="display: flex; flex-direction: column; gap: 8px;">
+                                                    <div>
+                                                        <div style="font-size: 0.7rem; color: #166534; opacity: 0.8; margin-bottom: 4px;">이수 영역</div>
+                                                        <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                                                            ${CONFIG.areas.filter(a => satisfiedAreas.has(a.id)).map(a => `<span style="font-size: 0.7rem; background: white; padding: 2px 6px; border-radius: 4px; border: 1px solid #bbf7d0; color: #166534;">${a.name}</span>`).join('')}
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <div style="font-size: 0.7rem; color: #166534; opacity: 0.8; margin-bottom: 4px;">이수 과목</div>
+                                                        <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                                                            ${Array.from(uniqueCourses).filter(c => CONFIG.basic_areas.includes(c)).map(c => `<span style="font-size: 0.7rem; background: #dcfce7; padding: 2px 6px; border-radius: 4px; color: #14532d; font-weight: 600;">${c}</span>`).join('')}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- 미이수 -->
+                                            <div>
+                                                <div style="font-size: 0.8rem; font-weight: 700; color: #991b1b; margin-bottom: 0.5rem;">⚠️ 미이수 현황</div>
+                                                <div style="display: flex; flex-direction: column; gap: 8px;">
+                                                    <div>
+                                                        <div style="font-size: 0.7rem; color: #991b1b; opacity: 0.8; margin-bottom: 4px;">미이수 영역</div>
+                                                        <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                                                            ${CONFIG.areas.filter(a => !satisfiedAreas.has(a.id)).map(a => `<span style="font-size: 0.7rem; background: #fef2f2; padding: 2px 6px; border-radius: 4px; border: 1px solid #fecdd3; color: #991b1b;">${a.name}</span>`).join('')}
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <div style="font-size: 0.7rem; color: #991b1b; opacity: 0.8; margin-bottom: 4px;">미이수 과목 (추천)</div>
+                                                        <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                                                            ${CONFIG.areas.filter(a => !satisfiedAreas.has(a.id)).map(a => `<span style="font-size: 0.7rem; color: #7f1d1d;">${a.subjects[0]}</span>`).join(', ')}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div>
-                                        <h4 style="font-size: 0.85rem; margin-bottom: 0.5rem; color: #b91c1c;">⚠️ 미충족 필수 영역 (기본이수/교과교육)</h4>
-                                        <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-                                            ${areaRequirement.items.filter(i => !i.pass).map(i => `<span style="font-size: 0.75rem; background: #fef2f2; padding: 4px 8px; border-radius: 6px; border: 1px solid #fee2e2; color: #991b1b;">${i.text}</span>`).join('')}
+
+                                    <!-- 교과교육 영역 -->
+                                    <div style="padding: 1.25rem; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px;">
+                                        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 1rem; color: #1e40af; border-bottom: 1px solid #dbeafe; padding-bottom: 0.5rem;">
+                                            <i data-lucide="layers" style="width: 18px;"></i>
+                                            <h4 style="font-size: 0.95rem; font-weight: 700;">교과교육 영역</h4>
+                                        </div>
+                                        
+                                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                            <div>
+                                                <div style="font-size: 0.8rem; font-weight: 700; color: #1e40af; margin-bottom: 0.5rem;">✅ 이수 완료</div>
+                                                <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                                                    ${CONFIG.essentials.filter(e => uniqueCourses.has(e)).map(e => `<span style="font-size: 0.7rem; background: white; padding: 2px 6px; border-radius: 4px; border: 1px solid #bfdbfe; color: #1e40af; font-weight: 600;">${e}</span>`).join('')}
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div style="font-size: 0.8rem; font-weight: 700; color: #991b1b; margin-bottom: 0.5rem;">⚠️ 미이수 과목</div>
+                                                <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                                                    ${CONFIG.essentials.filter(e => !uniqueCourses.has(e)).map(e => `<span style="font-size: 0.7rem; background: #fef2f2; padding: 2px 6px; border-radius: 4px; border: 1px solid #fecdd3; color: #991b1b;">${e}</span>`).join('')}
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
+
+                                    <!-- 기타 전공 및 공통 -->
+                                    <div style="padding: 1.25rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px;">
+                                        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 0.5rem; color: #475569;">
+                                            <i data-lucide="list" style="width: 16px;"></i>
+                                            <h4 style="font-size: 0.85rem; font-weight: 700;">기타 이수 완료 과목 (전공/교직)</h4>
+                                        </div>
+                                        <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                                            ${Array.from(uniqueCourses).filter(c => !CONFIG.basic_areas.includes(c) && !CONFIG.essentials.includes(c)).map(c => `<span style="font-size: 0.7rem; background: white; padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; color: #64748b;">${c}</span>`).join('')}
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
