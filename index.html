@@ -1316,7 +1316,7 @@
                 </div>
             </div>
 
-            <div style="margin-bottom: 2.5rem;">
+            <div id="section-gender" style="margin-bottom: 2.5rem;">
                 <div class="section-header-shaded">
                     <h3 id="req-h2"><i data-lucide="users" style="vertical-align: middle;"></i> 졸업요건2. 성인지교육</h3>
                     <a href="https://egc.cnu.ac.kr/egc/board/notice.do?mode=view&articleNo=288590&article.offset=0&articleLimit=15&srSearchVal=%EC%84%B1%EC%9D%B8%EC%A7%80%EA%B5%90%EC%9C%A1"
@@ -1350,7 +1350,7 @@
                 </div>
             </div>
 
-            <div style="margin-bottom: 2.5rem;">
+            <div id="section-cpr" style="margin-bottom: 2.5rem;">
                 <div class="section-header-shaded">
                     <h3 id="req-h4"><i data-lucide="heart-pulse" style="vertical-align: middle;"></i> 졸업요건4. 심폐소생술</h3>
                     <a href="https://egc.cnu.ac.kr/egc/board/notice.do?mode=view&articleNo=569225&article.offset=0&articleLimit=15&srSearchVal=%EC%8B%AC%ED%8F%90%EC%86%8C%EC%83%9D"
@@ -1369,7 +1369,7 @@
                 </div>
             </div>
 
-            <div style="margin-bottom: 2.5rem;">
+            <div id="section-apt" style="margin-bottom: 2.5rem;">
                 <div class="section-header-shaded">
                     <h3 id="req-h5"><i data-lucide="clipboard-check" style="vertical-align: middle;"></i> 졸업요건5. 교직 적성 및
                         인성 검사</h3>
@@ -1840,39 +1840,40 @@
 
             updateSemesterCredits();
 
-            // Hide/Show mandatory requirements based on track (Retraining skips some)
+            // Hide/Show mandatory requirements based on track
             const isRetraining = state.track.startsWith('retraining');
             const isYangseong = state.track.startsWith('yangseong');
-            const mandatorySections = [
-                document.getElementById('check-gender1').closest('div[style*="margin-bottom: 2.5rem"]'), // Gender
-                document.getElementById('check-cpr1').closest('div[style*="margin-bottom: 2.5rem"]'),   // CPR
-                document.getElementById('check-apt1').closest('div[style*="margin-bottom: 2.5rem"]'),    // Aptitude
-                document.getElementById('section-edu-practice') // Education Practice
-            ];
-            mandatorySections.forEach((section, idx) => {
-                if (section) {
-                    if (idx < 3) { // Gender, CPR, Aptitude
-                        if (isRetraining) section.classList.add('hidden');
-                        else section.classList.remove('hidden');
-                    } else if (idx === 3) { // Education Practice
-                        // Education Practice is required ONLY for Yangseong tracks
-                        if (state.track.startsWith('yangseong')) {
-                            section.classList.remove('hidden');
-                        } else {
-                            section.classList.add('hidden');
-                        }
-                    }
-                }
-            });
 
-            // Renumber requirements
+            // Gender, CPR, Aptitude
+            const genderSec = document.getElementById('section-gender');
+            const cprSec = document.getElementById('section-cpr');
+            const aptSec = document.getElementById('section-apt');
+
+            if (isRetraining) {
+                if (genderSec) genderSec.classList.add('hidden');
+                if (cprSec) cprSec.classList.add('hidden');
+                if (aptSec) aptSec.classList.add('hidden');
+            } else {
+                if (genderSec) genderSec.classList.remove('hidden');
+                if (cprSec) cprSec.classList.remove('hidden');
+                if (aptSec) aptSec.classList.remove('hidden');
+            }
+
+            // Education Practice (Required ONLY for Yangseong)
+            const practiceSec = document.getElementById('section-edu-practice');
+            if (practiceSec) {
+                if (isYangseong) practiceSec.classList.remove('hidden');
+                else practiceSec.classList.add('hidden');
+            }
+
+            // Renumber requirements in Step 2 UI
             let reqNumber = 1;
             const allReqHeaders = [
-                { id: 'req-h1', text: '수업 및 학점', icon: 'book-open', phones: [{ text: '기술교육과', num: '042-821-5691' }, { text: '교육대학원', num: '042-821-5252' }], link: 'https://techedu.cnu.ac.kr/techedu/edu/notice.do?mode=view&articleNo=289290&article.offset=0&articleLimit=10&srSearchVal=%ED%95%99%EC%82%AC%EC%A7%80%EB%8F%84' },
-                { id: 'req-h2', text: '성인지교육', icon: 'users', sectionId: 'check-gender1' },
+                { id: 'req-h1', text: '수업 및 학점', icon: 'book-open', link: 'https://techedu.cnu.ac.kr/techedu/edu/notice.do?mode=view&articleNo=289290&article.offset=0&articleLimit=10&srSearchVal=%ED%95%99%EC%82%AC%EC%A7%80%EB%8F%84', phones: [{ text: '기술교육과', num: '042-821-5691' }, { text: '교육대학원', num: '042-821-5252' }] },
+                { id: 'req-h2', text: '성인지교육', icon: 'users', sectionId: 'section-gender' },
                 { id: 'req-h3', text: '연구윤리', icon: 'shield-check' },
-                { id: 'req-h4', text: '심폐소생술', icon: 'heart-pulse', sectionId: 'check-cpr1' },
-                { id: 'req-h5', text: '교직 적성 및 인성 검사', icon: 'clipboard-check', sectionId: 'check-apt1' },
+                { id: 'req-h4', text: '심폐소생술', icon: 'heart-pulse', sectionId: 'section-cpr' },
+                { id: 'req-h5', text: '교직 적성 및 인성 검사', icon: 'clipboard-check', sectionId: 'section-apt' },
                 { id: 'req-h6', text: '종합시험 합격', icon: 'edit-3' },
                 { id: 'req-h-practice', text: '교육봉사 및 교육실습', icon: 'graduation-cap', sectionId: 'section-edu-practice' },
                 { id: 'req-h7', text: '', icon: 'file-text' } // Paper type is handled separately
@@ -1881,10 +1882,10 @@
             allReqHeaders.forEach(h => {
                 const el = document.getElementById(h.id);
                 if (!el) return;
-                const section = h.sectionId ? document.getElementById(h.sectionId).closest('div[style*="margin-bottom: 2.5rem"]') : null;
+                const section = h.sectionId ? document.getElementById(h.sectionId) : el.closest('div[style*="margin-bottom"]');
 
                 if (section && section.classList.contains('hidden')) {
-                    // Skip
+                    // This section is hidden, skip renumbering
                 } else {
                     let label = h.text;
                     if (h.id === 'req-h7') label = document.getElementById('paper-type-label').innerText;
@@ -1898,25 +1899,24 @@
                             guideHtml += `<a href="tel:${p.num}" class="guide-link" style="margin-left:${(idx === 0 && !h.link) ? 'auto' : '8px'}; font-size:0.75rem;"><i data-lucide="phone" style="width:12px;height:12px;"></i> ${p.text}: ${p.num}</a>`;
                         });
                     }
-                    if (h.guide) {
-                        guideHtml += `<a href="tel:${h.guide}" class="guide-link" style="margin-left:${h.link ? '8px' : 'auto'}; font-size:0.75rem;"><i data-lucide="phone" style="width:12px;height:12px;"></i> 문의: ${h.guide}</a>`;
-                    }
 
                     el.innerHTML = `<i data-lucide="${h.icon}" style="vertical-align: middle;"></i> 졸업요건${reqNumber}. ${label}${guideHtml}`;
 
-                    // Since we added a link inside h3, let's adjust the wrapper div to align them
-                    el.parentElement.style.display = 'flex';
-                    el.parentElement.style.justifyContent = 'space-between';
-                    el.parentElement.style.alignItems = 'center';
-                    el.style.flex = '1';
-                    el.style.display = 'flex';
-                    el.style.alignItems = 'center';
-                    el.style.gap = '8px';
+                    // Style adjustments to keep links aligned
+                    const headerWrapper = el.parentElement;
+                    if (headerWrapper && headerWrapper.classList.contains('section-header-shaded')) {
+                        headerWrapper.style.display = 'flex';
+                        headerWrapper.style.justifyContent = 'space-between';
+                        headerWrapper.style.alignItems = 'center';
+                        el.style.flex = '1';
+                        el.style.display = 'flex';
+                        el.style.alignItems = 'center';
+                        el.style.gap = '8px';
+                    }
 
                     reqNumber++;
                 }
             });
-
             lucide.createIcons();
         }
 
