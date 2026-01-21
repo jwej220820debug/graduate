@@ -2123,19 +2123,30 @@
             // Find the area-status div in the newly injected HTML and update it if needed (though it's already injected correctly now)
             // But since we are using innerHTML for the dashboard, we should ensure the initial injection is correct.
             const dashboardContainer = document.querySelector('.result-dashboard');
-            dashboardContainer.innerHTML = `
-                <div class="stat-card">
-                    <div class="stat-label">이수 학점 (기준: <span id="req-credits">${trackInfo.total}</span>)</div>
-                    <div class="stat-value"><span id="curr-credits">${totalCredits}</span></div>
-                    <div id="credit-status" class="status-pill ${creditPass ? 'status-pass' : 'status-fail'}">${creditPass ? '이수 완료' : (hasDuplicate ? '과목 중복' : '미충족')}</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">필수 요건 충족 (기본 5 + 교과 1)</div>
-                    <div class="stat-value"><span id="curr-areas">${areasDisplayCount}</span><span
-                            style="font-size: 1rem; color: var(--text-muted);">/${areasDisplayTarget}</span></div>
-                    <div id="area-status" class="status-pill ${areasPass ? 'status-pass' : 'status-fail'}">${areasPass ? (isRetraining ? '해당없음' : '전부 충족') : '일부 미비'}</div>
-                </div>
-            `;
+            if (isRetraining) {
+                dashboardContainer.innerHTML = `
+                    <div class="stat-card" style="grid-column: span 2;">
+                        <div class="stat-label">이수 학점 (기준: <span id="req-credits">${trackInfo.total}</span>)</div>
+                        <div class="stat-value"><span id="curr-credits">${totalCredits}</span></div>
+                        <div id="credit-status" class="status-pill ${creditPass ? 'status-pass' : 'status-fail'}">${creditPass ? '이수 완료' : (hasDuplicate ? '과목 중복' : '미충족')}</div>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 10px;">* 재교육 과정은 별도의 기본이수/교과교육 영역 조건 없이 총 이수 학점만 충족하면 됩니다.</p>
+                    </div>
+                `;
+            } else {
+                dashboardContainer.innerHTML = `
+                    <div class="stat-card">
+                        <div class="stat-label">이수 학점 (기준: <span id="req-credits">${trackInfo.total}</span>)</div>
+                        <div class="stat-value"><span id="curr-credits">${totalCredits}</span></div>
+                        <div id="credit-status" class="status-pill ${creditPass ? 'status-pass' : 'status-fail'}">${creditPass ? '이수 완료' : (hasDuplicate ? '과목 중복' : '미충족')}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">필수 요건 충족 (기본 5 + 교과 1)</div>
+                        <div class="stat-value"><span id="curr-areas">${areasDisplayCount}</span><span
+                                style="font-size: 1rem; color: var(--text-muted);">/${areasDisplayTarget}</span></div>
+                        <div id="area-status" class="status-pill ${areasPass ? 'status-pass' : 'status-fail'}">${areasPass ? '전부 충족' : '일부 미비'}</div>
+                    </div>
+                `;
+            }
 
             const links = {
                 gender: "https://egc.cnu.ac.kr/egc/board/notice.do?mode=view&articleNo=288590&article.offset=0&articleLimit=15&srSearchVal=%EC%84%B1%EC%9D%B8%EC%A7%80%EA%B5%90%EC%9C%A1",
@@ -2163,7 +2174,7 @@
                         { text: `전체 ${trackInfo.total}학점 중 ${totalCredits}학점 이수`, pass: totalCredits >= trackInfo.total, type: 'total' },
                         { text: `전공(일반/기본) ${trackInfo.major}학점 중 ${totalMajor}학점 이수`, pass: totalMajor >= trackInfo.major, type: 'major' },
                         { text: `교직 ${trackInfo.edu}학점 중 ${totalEdu}학점 이수`, pass: totalEdu >= trackInfo.edu, type: 'edu' },
-                        ...(!areasPass ? [{ text: "기본이수 및 교과교육 영역 미충족", pass: false }] : []),
+                        ...(!isRetraining && !areasPass ? [{ text: "기본이수 및 교과교육 영역 미충족", pass: false }] : []),
                         ...(hasDuplicate ? [{ text: "중복 선택된 과목 존재", pass: false }] : [])
                     ]
                 },
@@ -2353,7 +2364,8 @@
                                 </button>
                                 <div class="hidden" style="margin-top: 1rem; display: flex; flex-direction: column; gap: 1rem;">
                                     
-                                    <!-- 전공 - 기본이수 영역 -->
+                                    ${!isRetraining ? `
+                                    <!-- 전공 - 기본이수 영역 (Only for Non-Retraining) -->
                                     <div style="padding: 1.25rem; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px;">
                                         <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 1rem; color: #166534; border-bottom: 1px solid #dcfce7; padding-bottom: 0.5rem;">
                                             <i data-lucide="book" style="width: 18px;"></i>
@@ -2401,7 +2413,7 @@
                                         </div>
                                     </div>
 
-                                    <!-- 교과교육 영역 -->
+                                    <!-- 교과교육 영역 (Only for Non-Retraining) -->
                                     <div style="padding: 1.25rem; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px;">
                                         <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 1rem; color: #1e40af; border-bottom: 1px solid #dbeafe; padding-bottom: 0.5rem;">
                                             <i data-lucide="layers" style="width: 18px;"></i>
@@ -2424,7 +2436,7 @@
                                         </div>
                                     </div>
 
-                                    <!-- 기타 전공 및 공통 -->
+                                    <!-- 기타 전공 및 공통 (Shown for Non-Retraining) -->
                                     <div style="padding: 1.25rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px;">
                                         <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 0.5rem; color: #475569;">
                                             <i data-lucide="list" style="width: 16px;"></i>
@@ -2434,6 +2446,29 @@
                                             ${Array.from(uniqueCourses).filter(c => !CONFIG.basic_areas.includes(c) && !CONFIG.essentials.includes(c)).map(c => `<span style="font-size: 0.7rem; background: white; padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; color: #64748b;">${c}</span>`).join('')}
                                         </div>
                                     </div>
+                                    
+                                    ` : `
+                                    <!-- Simplified list for Retraining Tracks -->
+                                    <div style="padding: 1.25rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px;">
+                                        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 1rem; color: #475569; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">
+                                            <i data-lucide="book" style="width: 18px;"></i>
+                                            <h4 style="font-size: 0.95rem; font-weight: 700;">전공 이수 과목 내역</h4>
+                                        </div>
+                                        <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                                            ${Array.from(uniqueCourses).filter(c => !CONFIG.edu_subjects.includes(c)).map(c => `<span style="font-size: 0.75rem; background: white; padding: 4px 10px; border-radius: 8px; border: 1px solid #bfdbfe; color: #1e40af; font-weight: 600;">${c}</span>`).join('')}
+                                        </div>
+                                    </div>
+
+                                    <div style="padding: 1.25rem; background: #f5f3ff; border: 1px solid #ddd6fe; border-radius: 12px;">
+                                        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 1rem; color: #5b21b6; border-bottom: 1px solid #ede9fe; padding-bottom: 0.5rem;">
+                                            <i data-lucide="layers" style="width: 18px;"></i>
+                                            <h4 style="font-size: 0.95rem; font-weight: 700;">교직 이수 과목 내역</h4>
+                                        </div>
+                                        <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                                            ${Array.from(uniqueCourses).filter(c => CONFIG.edu_subjects.includes(c)).map(c => `<span style="font-size: 0.75rem; background: white; padding: 4px 10px; border-radius: 8px; border: 1px solid #ddd6fe; color: #5b21b6; font-weight: 600;">${c}</span>`).join('')}
+                                        </div>
+                                    </div>
+                                    `}
 
                                 </div>
                             </div>
