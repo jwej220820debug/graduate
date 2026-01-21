@@ -1837,8 +1837,8 @@
                         if (isRetraining) section.classList.add('hidden');
                         else section.classList.remove('hidden');
                     } else if (idx === 3) { // Education Practice
-                        // Education Practice is required for both Yangseong and Minor tracks
-                        if (state.track.startsWith('yangseong') || state.track.startsWith('minor')) {
+                        // Education Practice is required ONLY for Yangseong tracks
+                        if (state.track.startsWith('yangseong')) {
                             section.classList.remove('hidden');
                         } else {
                             section.classList.add('hidden');
@@ -2526,9 +2526,9 @@
                     if (r.id === 2 || r.id === 4 || r.id === 5) return false;
                 }
 
-                // Education Practice (Req 7) is for Yangseong and Minor tracks
+                // Education Practice (Req 7) is ONLY for Yangseong tracks
                 if (r.id === 7) {
-                    if (isYangseongResult || isMinorResult) return true;
+                    if (isYangseongResult) return true;
                     return false;
                 }
 
