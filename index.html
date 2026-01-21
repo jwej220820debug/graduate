@@ -1273,10 +1273,11 @@
                 </div>
                 <div class="grid-list">
                     <label class="checkbox-container">심폐소생술 1회 (서로 다른 년도)
-                        <input type="checkbox" id="check-cpr1"><span class="checkmark"></span>
+                        <input type="checkbox" id="check-cpr1" onchange="saveData()"><span class="checkmark"></span>
                     </label>
                     <label class="checkbox-container">심폐소생술 2회 (서로 다른 년도)
-                        <input type="checkbox" id="check-cpr2"><span class="checkmark"></span>
+                        <input type="checkbox" id="check-cpr2"
+                            onchange="handleSequentialCheck(this, 'check-cpr1')"><span class="checkmark"></span>
                     </label>
                 </div>
             </div>
@@ -1292,10 +1293,11 @@
                 </div>
                 <div class="grid-list">
                     <label class="checkbox-container">교직 적성 및 인성 검사 1회 적격
-                        <input type="checkbox" id="check-apt1"><span class="checkmark"></span>
+                        <input type="checkbox" id="check-apt1" onchange="saveData()"><span class="checkmark"></span>
                     </label>
                     <label class="checkbox-container">교직 적성 및 인성 검사 2회 적격
-                        <input type="checkbox" id="check-apt2"><span class="checkmark"></span>
+                        <input type="checkbox" id="check-apt2"
+                            onchange="handleSequentialCheck(this, 'check-apt1')"><span class="checkmark"></span>
                     </label>
                 </div>
             </div>
@@ -1725,27 +1727,14 @@
             }
 
 
-            // Other requirements auto-save
-            document.querySelectorAll('#step-2 input[type="checkbox"]').forEach(chk => {
+            // Other requirements auto-save (Static ones are handled by onchange in HTML)
+            document.querySelectorAll('#step-2 input[type="checkbox"]:not(.paper-step-check):not([id*="cpr"]):not([id*="apt"])').forEach(chk => {
+                chk.removeEventListener('change', saveData); // Avoid duplicates
                 chk.addEventListener('change', saveData);
             });
 
-            // Sequential Auto-check for CPR and Aptitude
-            const cpr2 = document.getElementById('check-cpr2');
-            const cpr1 = document.getElementById('check-cpr1');
-            cpr2.addEventListener('change', () => {
-                if (cpr2.checked) cpr1.checked = true;
-                saveData();
-            });
-
-            const apt2 = document.getElementById('check-apt2');
-            const apt1 = document.getElementById('check-apt1');
-            apt2.addEventListener('change', () => {
-                if (apt2.checked) apt1.checked = true;
-                saveData();
-            });
-
             document.querySelectorAll('.course-input').forEach(input => {
+                input.removeEventListener('change', saveData);
                 input.addEventListener('change', () => {
                     saveData();
                     updateSemesterCredits();
@@ -2693,13 +2682,21 @@
             lucide.createIcons();
         }
 
+        function handleSequentialCheck(el, targetId) {
+            if (el.checked) {
+                const target = document.getElementById(targetId);
+                if (target) target.checked = true;
+            }
+            saveData();
+        }
+
         function handlePaperStepChange(el) {
             if (el.checked) {
                 const stepId = parseInt(el.getAttribute('data-step-id'));
                 // Check all previous steps
-                for (let i = 1; i < stepId; i++) {
-                    const prev = document.getElementById(`paper-step${i}`);
-                    if (prev) prev.checked = true;
+                for (let i = 1; i <= stepId; i++) {
+                    const step = document.getElementById(`paper-step${i}`);
+                    if (step) step.checked = true;
                 }
             }
             saveData();
