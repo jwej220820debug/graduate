@@ -1179,10 +1179,36 @@
                 </div>
             </div>
 
+            <!-- Education Service and Teaching Practice -->
+            <div style="margin-bottom: 2.5rem;" id="section-edu-practice">
+                <div class="section-header-shaded">
+                    <h3 id="req-h-practice"><i data-lucide="graduation-cap" style="vertical-align: middle;"></i> 졸업요건7.
+                        교육봉사 및 교육실습</h3>
+                </div>
+                <div class="grid-list">
+                    <label class="checkbox-container">교육봉사 해당 없음
+                        <input type="checkbox" id="check-edu-service-na" onchange="saveData()"><span
+                            class="checkmark"></span>
+                    </label>
+                    <label class="checkbox-container">교육실습 해당 없음
+                        <input type="checkbox" id="check-teaching-practice-na" onchange="saveData()"><span
+                            class="checkmark"></span>
+                    </label>
+                    <label class="checkbox-container">교육봉사 60시간 완료
+                        <input type="checkbox" id="check-edu-service-60" onchange="saveData()"><span
+                            class="checkmark"></span>
+                    </label>
+                    <label class="checkbox-container">교육실습 1회 완료
+                        <input type="checkbox" id="check-teaching-practice-1" onchange="saveData()"><span
+                            class="checkmark"></span>
+                    </label>
+                </div>
+            </div>
+
             <!-- Paper / Thesis Steps -->
             <div id="paper-steps-area">
                 <div class="section-header-shaded">
-                    <h3 id="req-h7"><i data-lucide="file-text" style="vertical-align: middle;"></i> 졸업요건7. <span
+                    <h3 id="req-h7"><i data-lucide="file-text" style="vertical-align: middle;"></i> 졸업요건8. <span
                             id="paper-type-label">연구보고서</span></h3>
                 </div>
                 <div class="grid-list" id="paper-checklist">
@@ -1433,15 +1459,22 @@
 
             // Hide/Show mandatory requirements based on track (Retraining skips some)
             const isRetraining = state.track.startsWith('retraining');
+            const isYangseong = state.track.startsWith('yangseong');
             const mandatorySections = [
                 document.getElementById('check-gender1').closest('div[style*="margin-bottom: 2.5rem"]'), // Gender
                 document.getElementById('check-cpr1').closest('div[style*="margin-bottom: 2.5rem"]'),   // CPR
-                document.getElementById('check-apt1').closest('div[style*="margin-bottom: 2.5rem"]')    // Aptitude
+                document.getElementById('check-apt1').closest('div[style*="margin-bottom: 2.5rem"]'),    // Aptitude
+                document.getElementById('section-edu-practice') // Education Practice
             ];
-            mandatorySections.forEach(section => {
+            mandatorySections.forEach((section, idx) => {
                 if (section) {
-                    if (isRetraining) section.classList.add('hidden');
-                    else section.classList.remove('hidden');
+                    if (idx < 3) { // Gender, CPR, Aptitude
+                        if (isRetraining) section.classList.add('hidden');
+                        else section.classList.remove('hidden');
+                    } else if (idx === 3) { // Education Practice
+                        if (!isYangseong) section.classList.add('hidden');
+                        else section.classList.remove('hidden');
+                    }
                 }
             });
 
@@ -1454,6 +1487,7 @@
                 { id: 'req-h4', text: '심폐소생술', icon: 'heart-pulse', sectionId: 'check-cpr1' },
                 { id: 'req-h5', text: '교직 적성 및 인성 검사', icon: 'clipboard-check', sectionId: 'check-apt1' },
                 { id: 'req-h6', text: '종합시험 합격', icon: 'edit-3' },
+                { id: 'req-h-practice', text: '교육봉사 및 교육실습', icon: 'graduation-cap', sectionId: 'section-edu-practice' },
                 { id: 'req-h7', text: '', icon: 'file-text' } // Paper type is handled separately
             ];
 
@@ -1690,7 +1724,11 @@
                     examEdu: document.getElementById('exam-edu').checked,
                     examTec: document.getElementById('exam-tecedu').checked,
                     examCon: document.getElementById('exam-construct').checked,
-                    examElec: document.getElementById('exam-elec').checked
+                    examElec: document.getElementById('exam-elec').checked,
+                    eduServiceNA: document.getElementById('check-edu-service-na').checked,
+                    eduService60: document.getElementById('check-edu-service-60').checked,
+                    teachingPracticeNA: document.getElementById('check-teaching-practice-na').checked,
+                    teachingPractice1: document.getElementById('check-teaching-practice-1').checked
                 },
                 paperSteps: Array.from(document.querySelectorAll('#paper-checklist input')).map(i => i.checked)
             };
@@ -1760,6 +1798,10 @@
                 document.getElementById('exam-tecedu').checked = data.checks.examTec;
                 document.getElementById('exam-construct').checked = data.checks.examCon;
                 document.getElementById('exam-elec').checked = data.checks.examElec;
+                if (data.checks.eduServiceNA !== undefined) document.getElementById('check-edu-service-na').checked = data.checks.eduServiceNA;
+                if (data.checks.eduService60 !== undefined) document.getElementById('check-edu-service-60').checked = data.checks.eduService60;
+                if (data.checks.teachingPracticeNA !== undefined) document.getElementById('check-teaching-practice-na').checked = data.checks.teachingPracticeNA;
+                if (data.checks.teachingPractice1 !== undefined) document.getElementById('check-teaching-practice-1').checked = data.checks.teachingPractice1;
             }
 
             // Hydrate Paper Steps
@@ -1830,7 +1872,10 @@
                 cpr: isRetraining || (document.getElementById('check-cpr1').checked && document.getElementById('check-cpr2').checked),
                 apt: isRetraining || (document.getElementById('check-apt1').checked && document.getElementById('check-apt2').checked),
                 exam: document.getElementById('exam-edu').checked && document.getElementById('exam-tecedu').checked &&
-                    document.getElementById('exam-construct').checked && document.getElementById('exam-elec').checked
+                    document.getElementById('exam-construct').checked && document.getElementById('exam-elec').checked,
+                eduPractice: !state.track.startsWith('yangseong') ||
+                    ((document.getElementById('check-edu-service-na').checked || document.getElementById('check-edu-service-60').checked) &&
+                        (document.getElementById('check-teaching-practice-na').checked || document.getElementById('check-teaching-practice-1').checked))
             };
 
             // 5. Paper Steps Check
@@ -1962,13 +2007,40 @@
                 },
                 {
                     id: 7,
-                    title: `졸업요건7. ${paperLabel}`,
+                    title: "졸업요건7. 교육봉사 및 교육실습",
+                    pass: checks.eduPractice,
+                    items: [
+                        { text: "교육봉사 이수 (60시간 또는 해당없음)", pass: document.getElementById('check-edu-service-na').checked || document.getElementById('check-edu-service-60').checked },
+                        { text: "교육실습 이수 (1회 또는 해당없음)", pass: document.getElementById('check-teaching-practice-na').checked || document.getElementById('check-teaching-practice-1').checked }
+                    ]
+                },
+                {
+                    id: 8,
+                    title: `졸업요건8. ${paperLabel}`,
                     pass: paperDone,
                     items: Array.from(document.querySelectorAll('#paper-checklist input')).map((input, idx) => {
                         return { text: input.parentElement.innerText.trim(), pass: input.checked };
                     })
                 }
             ];
+
+            // Re-filter and re-number for the final dashboard view
+            const isYangseongResult = state.track.startsWith('yangseong');
+            const finalRequirements = requirements.filter(r => {
+                if (isRetraining) {
+                    // Hide 2(Gender), 4(CPR), 5(Aptitude) for retraining
+                    if (r.id === 2 || r.id === 4 || r.id === 5) return false;
+                }
+                if (!isYangseongResult) {
+                    // Hide 7(Education Practice) for non-Yangseong
+                    if (r.id === 7) return false;
+                }
+                return true;
+            }).map((r, idx) => {
+                const newId = idx + 1;
+                r.title = r.title.replace(/졸업요건\d+/, `졸업요건${newId}`);
+                return r;
+            });
 
             // Additional check for Basic Areas inside Requirement 1 or a new hidden check
             // Let's add area and essential missing info to the credit/area details
@@ -1982,7 +2054,7 @@
 
             // Inject into UI
             const container = document.getElementById('requirement-detailed-results');
-            container.innerHTML = requirements.map(req => `
+            container.innerHTML = finalRequirements.map(req => `
                 <div class="requirement-card ${!req.pass ? 'open' : ''}" onclick="this.classList.toggle('open')">
                     <div class="requirement-header">
                         <div class="requirement-title">
