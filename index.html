@@ -977,9 +977,11 @@
             border: 1px solid #e2e8f0;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             font-size: 0.8rem;
             font-weight: 600;
+            white-space: nowrap;
+            /* Prevent wrapping of the whole tile content */
         }
 
         .area-status-tile.pass {
@@ -1676,7 +1678,7 @@
 
             const createPaperItem = (id, label, link = null) => {
                 const linkHtml = link ? ` <a href="${link}" target="_blank" class="guide-link" style="padding: 2px 6px; font-size: 0.7rem; margin-left: 5px;" onclick="event.stopPropagation()">안내</a>` : '';
-                return `<label class="checkbox-container">${label}${linkHtml}<input type="checkbox" id="paper-step${id}" onchange="saveData()"><span class="checkmark"></span></label>`;
+                return `<label class="checkbox-container">${label}${linkHtml}<input type="checkbox" id="paper-step${id}" class="paper-step-check" data-step-id="${id}" onchange="handlePaperStepChange(this)"><span class="checkmark"></span></label>`;
             };
 
             const thesisLinks = {
@@ -1727,6 +1729,22 @@
             document.querySelectorAll('#step-2 input[type="checkbox"]').forEach(chk => {
                 chk.addEventListener('change', saveData);
             });
+
+            // Sequential Auto-check for CPR and Aptitude
+            const cpr2 = document.getElementById('check-cpr2');
+            const cpr1 = document.getElementById('check-cpr1');
+            cpr2.addEventListener('change', () => {
+                if (cpr2.checked) cpr1.checked = true;
+                saveData();
+            });
+
+            const apt2 = document.getElementById('check-apt2');
+            const apt1 = document.getElementById('check-apt1');
+            apt2.addEventListener('change', () => {
+                if (apt2.checked) apt1.checked = true;
+                saveData();
+            });
+
             document.querySelectorAll('.course-input').forEach(input => {
                 input.addEventListener('change', () => {
                     saveData();
@@ -2476,15 +2494,15 @@
                             ${!isRetraining ? `
                             <div style="margin-bottom: 1.5rem;">
                                 <strong style="font-size: 0.85rem; display: block; margin-bottom: 0.75rem; color: var(--text-main);">기본이수 및 교과교육 영역 현황</strong>
-                                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px;">
+                                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px;">
                                     ${areaRequirement.items.map(i => {
                         const isBasic = i.text.includes('기본이수');
                         const color = isBasic ? '#059669' : '#2563eb';
                         return `
                                         <div class="area-status-tile ${i.pass ? 'pass' : 'fail'}" style="${i.pass ? `color: ${color}; border-color: ${color}44;` : ''}">
-                                            <i data-lucide="${i.pass ? 'check-circle' : 'circle'}" style="width: 14px;"></i>
-                                            <span style="color: ${color}; font-weight: 800; margin-right: 4px;">${isBasic ? '기본' : '교과'}</span>
-                                            ${i.text.replace(/기본이수 \[|\]|교과교육 \[/g, '')}
+                                            <i data-lucide="${i.pass ? 'check-circle' : 'circle'}" style="width: 14px; flex-shrink: 0;"></i>
+                                            <span style="color: ${color}; font-weight: 800; margin-right: 4px; white-space: nowrap; flex-shrink: 0;">${isBasic ? '기본' : '교과'}</span>
+                                            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${i.text.replace(/기본이수 \[|\]|교과교육 \[/g, '')}</span>
                                         </div>
                                     `}).join('')}
                                 </div>
@@ -2577,14 +2595,25 @@
                                         </div>
                                     </div>
 
-                                    <!-- 기타 전공 및 공통 (Shown for Non-Retraining) -->
+                                    <!-- 일반 전공 (Shown for Non-Retraining) -->
                                     <div style="padding: 1.25rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px;">
                                         <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 0.5rem; color: #475569;">
                                             <i data-lucide="list" style="width: 16px;"></i>
-                                            <h4 style="font-size: 0.85rem; font-weight: 700;">기타 이수 완료 과목 (전공/교직)</h4>
+                                            <h4 style="font-size: 0.85rem; font-weight: 700;">일반전공 이수 완료 과목</h4>
                                         </div>
                                         <div style="display: flex; flex-wrap: wrap; gap: 4px;">
-                                            ${Array.from(uniqueCourses).filter(c => !CONFIG.basic_areas.includes(c) && !CONFIG.essentials.includes(c)).map(c => `<span style="font-size: 0.7rem; background: white; padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; color: #64748b;">${c}</span>`).join('')}
+                                            ${Array.from(uniqueCourses).filter(c => CONFIG.major_subjects.includes(c) && !CONFIG.basic_areas.includes(c) && !CONFIG.essentials.includes(c)).map(c => `<span style="font-size: 0.7rem; background: white; padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; color: #64748b;">${c}</span>`).join('')}
+                                        </div>
+                                    </div>
+
+                                    <!-- 교직 과목 (Shown for Non-Retraining) -->
+                                    <div style="padding: 1.25rem; background: #f5f3ff; border: 1px solid #ddd6fe; border-radius: 12px;">
+                                        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 0.5rem; color: #5b21b6;">
+                                            <i data-lucide="user-check" style="width: 16px;"></i>
+                                            <h4 style="font-size: 0.85rem; font-weight: 700;">교직 이수 완료 과목</h4>
+                                        </div>
+                                        <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                                            ${Array.from(uniqueCourses).filter(c => CONFIG.edu_subjects.includes(c)).map(c => `<span style="font-size: 0.7rem; background: white; padding: 2px 6px; border-radius: 4px; border: 1px solid #ddd6fe; color: #5b21b6;">${c}</span>`).join('')}
                                         </div>
                                     </div>
                                     
@@ -2662,6 +2691,18 @@
             }
 
             lucide.createIcons();
+        }
+
+        function handlePaperStepChange(el) {
+            if (el.checked) {
+                const stepId = parseInt(el.getAttribute('data-step-id'));
+                // Check all previous steps
+                for (let i = 1; i < stepId; i++) {
+                    const prev = document.getElementById(`paper-step${i}`);
+                    if (prev) prev.checked = true;
+                }
+            }
+            saveData();
         }
 
         // Initialize
