@@ -1058,7 +1058,7 @@
             <!-- Graduation Requirement 1 -->
             <div style="margin-bottom: 3.5rem;">
                 <div class="section-header-shaded">
-                    <h3><i data-lucide="book-open" style="vertical-align: middle;"></i> 졸업요건1. 수업 및 학점</h3>
+                    <h3 id="req-h1"><i data-lucide="book-open" style="vertical-align: middle;"></i> 졸업요건1. 수업 및 학점</h3>
                 </div>
 
                 <!-- Undergraduate Recognition (Only for Major) -->
@@ -1087,7 +1087,7 @@
 
             <div style="margin-bottom: 2.5rem;">
                 <div class="section-header-shaded">
-                    <h3><i data-lucide="users" style="vertical-align: middle;"></i> 졸업요건2. 성인지교육</h3>
+                    <h3 id="req-h2"><i data-lucide="users" style="vertical-align: middle;"></i> 졸업요건2. 성인지교육</h3>
                     <a href="https://egc.cnu.ac.kr/egc/board/notice.do?mode=view&articleNo=288590&article.offset=0&articleLimit=15&srSearchVal=%EC%84%B1%EC%9D%B8%EC%A7%80%EA%B5%90%EC%9C%A1"
                         target="_blank" class="guide-link" style="margin-top:0;">
                         <i data-lucide="external-link" style="width: 14px; height: 14px;"></i> 안내
@@ -1105,7 +1105,7 @@
 
             <div style="margin-bottom: 2.5rem;">
                 <div class="section-header-shaded">
-                    <h3><i data-lucide="shield-check" style="vertical-align: middle;"></i> 졸업요건3. 연구윤리</h3>
+                    <h3 id="req-h3"><i data-lucide="shield-check" style="vertical-align: middle;"></i> 졸업요건3. 연구윤리</h3>
                     <a href="https://egc.cnu.ac.kr/egc/board/notice.do?mode=view&articleNo=538237&article.offset=0&articleLimit=15&srSearchVal=%EC%97%B0%EA%B5%AC%EC%9C%A4%EB%A6%AC"
                         target="_blank" class="guide-link" style="margin-top:0;">
                         <i data-lucide="external-link" style="width: 14px; height: 14px;"></i> 안내
@@ -1120,7 +1120,7 @@
 
             <div style="margin-bottom: 2.5rem;">
                 <div class="section-header-shaded">
-                    <h3><i data-lucide="heart-pulse" style="vertical-align: middle;"></i> 졸업요건4. 심폐소생술</h3>
+                    <h3 id="req-h4"><i data-lucide="heart-pulse" style="vertical-align: middle;"></i> 졸업요건4. 심폐소생술</h3>
                     <a href="https://egc.cnu.ac.kr/egc/board/notice.do?mode=view&articleNo=569225&article.offset=0&articleLimit=15&srSearchVal=%EC%8B%AC%ED%8F%90%EC%86%8C%EC%83%9D"
                         target="_blank" class="guide-link" style="margin-top:0;">
                         <i data-lucide="external-link" style="width: 14px; height: 14px;"></i> 안내
@@ -1138,7 +1138,8 @@
 
             <div style="margin-bottom: 2.5rem;">
                 <div class="section-header-shaded">
-                    <h3><i data-lucide="clipboard-check" style="vertical-align: middle;"></i> 졸업요건5. 교직 적성 및 인성 검사</h3>
+                    <h3 id="req-h5"><i data-lucide="clipboard-check" style="vertical-align: middle;"></i> 졸업요건5. 교직 적성 및
+                        인성 검사</h3>
                     <a href="https://egc.cnu.ac.kr/egc/board/notice.do?mode=view&articleNo=566109&article.offset=0&articleLimit=15&srSearchVal=%EC%A0%81%EC%84%B1"
                         target="_blank" class="guide-link" style="margin-top:0;">
                         <i data-lucide="external-link" style="width: 14px; height: 14px;"></i> 안내
@@ -1156,7 +1157,7 @@
 
             <div style="margin-bottom: 2.5rem;">
                 <div class="section-header-shaded">
-                    <h3><i data-lucide="edit-3" style="vertical-align: middle;"></i> 졸업요건6. 종합시험 합격</h3>
+                    <h3 id="req-h6"><i data-lucide="edit-3" style="vertical-align: middle;"></i> 졸업요건6. 종합시험 합격</h3>
                     <a href="https://egc.cnu.ac.kr/egc/board/notice.do?mode=view&articleNo=573353&article.offset=0&articleLimit=15&srSearchVal=%EC%A2%85%ED%95%A9%EC%8B%9C%ED%97%98"
                         target="_blank" class="guide-link" style="margin-top:0;">
                         <i data-lucide="external-link" style="width: 14px; height: 14px;"></i> 안내
@@ -1181,7 +1182,7 @@
             <!-- Paper / Thesis Steps -->
             <div id="paper-steps-area">
                 <div class="section-header-shaded">
-                    <h3><i data-lucide="file-text" style="vertical-align: middle;"></i> 졸업요건7. <span
+                    <h3 id="req-h7"><i data-lucide="file-text" style="vertical-align: middle;"></i> 졸업요건7. <span
                             id="paper-type-label">연구보고서</span></h3>
                 </div>
                 <div class="grid-list" id="paper-checklist">
@@ -1441,6 +1442,33 @@
                 if (section) {
                     if (isRetraining) section.classList.add('hidden');
                     else section.classList.remove('hidden');
+                }
+            });
+
+            // Renumber requirements
+            let reqNumber = 1;
+            const allReqHeaders = [
+                { id: 'req-h1', text: '수업 및 학점', icon: 'book-open' },
+                { id: 'req-h2', text: '성인지교육', icon: 'users', sectionId: 'check-gender1' },
+                { id: 'req-h3', text: '연구윤리', icon: 'shield-check' },
+                { id: 'req-h4', text: '심폐소생술', icon: 'heart-pulse', sectionId: 'check-cpr1' },
+                { id: 'req-h5', text: '교직 적성 및 인성 검사', icon: 'clipboard-check', sectionId: 'check-apt1' },
+                { id: 'req-h6', text: '종합시험 합격', icon: 'edit-3' },
+                { id: 'req-h7', text: '', icon: 'file-text' } // Paper type is handled separately
+            ];
+
+            allReqHeaders.forEach(h => {
+                const el = document.getElementById(h.id);
+                if (!el) return;
+                const section = h.sectionId ? document.getElementById(h.sectionId).closest('div[style*="margin-bottom: 2.5rem"]') : null;
+
+                if (section && section.classList.contains('hidden')) {
+                    // Skip
+                } else {
+                    let label = h.text;
+                    if (h.id === 'req-h7') label = document.getElementById('paper-type-label').innerText;
+                    el.innerHTML = `<i data-lucide="${h.icon}" style="vertical-align: middle;"></i> 졸업요건${reqNumber}. ${label}`;
+                    reqNumber++;
                 }
             });
 
