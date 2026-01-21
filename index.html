@@ -499,6 +499,14 @@
             user-select: none;
         }
 
+        .checkbox-container input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
         .checkbox-container.disabled-excluded {
             text-decoration: line-through;
             opacity: 0.5;
@@ -2570,7 +2578,12 @@
                                                     <div>
                                                         <div style="font-size: 0.7rem; color: #991b1b; opacity: 0.8; margin-bottom: 4px;">미이수 과목 (추천)</div>
                                                         <div style="display: flex; flex-wrap: wrap; gap: 4px;">
-                                                            ${CONFIG.areas.filter(a => !satisfiedAreas.has(a.id)).map(a => `<span style="font-size: 0.7rem; color: #7f1d1d;">${a.subjects[0]}</span>`).join(', ')}
+                                                            ${CONFIG.areas.filter(a => !satisfiedAreas.has(a.id)).map(a => {
+                            let recommend = a.subjects[0];
+                            if (a.name === '통신 및 전기전자') recommend = '정보통신기술(or 전기전자기술)';
+                            if (a.name === '수송 및 동력') recommend = '수송기술(or 동력 및 에너지기술)';
+                            return `<span style="font-size: 0.7rem; color: #7f1d1d;">${recommend}</span>`;
+                        }).join(', ')}
                                                         </div>
                                                     </div>
                                                 </div>
