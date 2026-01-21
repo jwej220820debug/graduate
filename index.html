@@ -847,6 +847,89 @@
             background: #f9f9f9;
         }
 
+        /* Improved Requirement 1 UI */
+        .credit-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (max-width: 600px) {
+            .credit-summary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .credit-card {
+            padding: 1rem;
+            border-radius: 12px;
+            background: white;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .credit-card-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .credit-card-value {
+            font-size: 1.1rem;
+            font-weight: 800;
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+        }
+
+        .credit-card-target {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .credit-progress-bg {
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .credit-progress-bar {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .area-status-tile {
+            padding: 0.75rem;
+            border-radius: 10px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .area-status-tile.pass {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+            color: #166534;
+        }
+
+        .area-status-tile.fail {
+            background: #fff1f2;
+            border-color: #fecdd3;
+            color: #9f1239;
+            opacity: 0.7;
+        }
+
         .category-btn {
             font-size: 0.9rem !important;
             justify-content: center !important;
@@ -2112,7 +2195,86 @@
 
             // Inject into UI
             const container = document.getElementById('requirement-detailed-results');
-            container.innerHTML = finalRequirements.map(req => `
+            container.innerHTML = finalRequirements.map(req => {
+                // Special rendering for Requirement 1 (Credits & Areas)
+                if (req.id === 1) {
+                    const totalPct = Math.min(100, (totalCredits / trackInfo.total) * 100);
+                    const majorPct = Math.min(100, (totalMajor / trackInfo.major) * 100);
+                    const eduPct = trackInfo.edu > 0 ? Math.min(100, (totalEdu / trackInfo.edu) * 100) : 100;
+
+                    return `
+                    <div class="requirement-card ${!req.pass ? 'open' : ''}" onclick="this.classList.toggle('open')">
+                        <div class="requirement-header">
+                            <div class="requirement-title">
+                                <i data-lucide="${req.pass ? 'check-circle' : 'alert-circle'}" 
+                                   class="${req.pass ? 'color-basic' : 'color-danger'}" style="width: 20px;"></i>
+                                <div style="display: flex; flex-direction: column;">
+                                    <span>${req.title}</span>
+                                    <div style="display: flex; gap: 8px;">
+                                        ${req.guide ? `<a href="${req.guide}" target="_blank" class="guide-link" style="margin-left:0; font-size: 0.75rem;"><i data-lucide="external-link" style="width:12px;height:12px;"></i> 안내</a>` : ''}
+                                        ${req.phone ? `<a href="tel:${req.phone}" class="guide-link" style="margin-left:0; font-size: 0.75rem;"><i data-lucide="phone" style="width:12px;height:12px;"></i> 문의: ${req.phone}</a>` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="requirement-status">
+                                <span class="status-pill ${req.pass ? 'status-pass' : 'status-fail'}">${req.pass ? '충족' : '미충족'}</span>
+                                <i data-lucide="chevron-down" class="chevron-icon" style="width: 18px;"></i>
+                            </div>
+                        </div>
+                        <div class="requirement-content" onclick="event.stopPropagation()">
+                            <div class="credit-summary-grid" style="margin-top: 1.5rem;">
+                                <!-- Total Credits -->
+                                <div class="credit-card">
+                                    <span class="credit-card-label">전체 학점</span>
+                                    <div class="credit-card-value">${totalCredits} <span class="credit-card-target">/ ${trackInfo.total}</span></div>
+                                    <div class="credit-progress-bg">
+                                        <div class="credit-progress-bar" style="width: ${totalPct}%; background: var(--primary);"></div>
+                                    </div>
+                                </div>
+                                <!-- Major Credits -->
+                                <div class="credit-card">
+                                    <span class="credit-card-label">전공 학점</span>
+                                    <div class="credit-card-value">${totalMajor} <span class="credit-card-target">/ ${trackInfo.major}</span></div>
+                                    <div class="credit-progress-bg">
+                                        <div class="credit-progress-bar" style="width: ${majorPct}%; background: #059669;"></div>
+                                    </div>
+                                </div>
+                                <!-- Edu Credits -->
+                                <div class="credit-card" style="${trackInfo.edu === 0 ? 'opacity: 0.5;' : ''}">
+                                    <span class="credit-card-label">교직 학점</span>
+                                    <div class="credit-card-value">${totalEdu} <span class="credit-card-target">/ ${trackInfo.edu}</span></div>
+                                    <div class="credit-progress-bg">
+                                        <div class="credit-progress-bar" style="width: ${eduPct}%; background: #7c3aed;"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            ${!isRetraining ? `
+                            <div style="margin-bottom: 1.5rem;">
+                                <strong style="font-size: 0.85rem; display: block; margin-bottom: 0.75rem; color: var(--text-main);">기본이수 및 교과교육 영역 현황</strong>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px;">
+                                    ${areaRequirement.items.map(i => `
+                                        <div class="area-status-tile ${i.pass ? 'pass' : 'fail'}">
+                                            <i data-lucide="${i.pass ? 'check-circle' : 'circle'}" style="width: 14px;"></i>
+                                            ${i.text.replace(/기본이수 |교과교육 /, '')}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            ` : ''}
+
+                            ${hasDuplicate ? `
+                            <div class="missing-item" style="margin-top: 10px;">
+                                <i data-lucide="alert-triangle" style="width: 16px;"></i>
+                                <span>중복 선택된 과목이 존재합니다. 동일 과목은 중복 인정되지 않습니다.</span>
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>`;
+                }
+
+                // Default rendering for other requirements
+                return `
                 <div class="requirement-card ${!req.pass ? 'open' : ''}" onclick="this.classList.toggle('open')">
                     <div class="requirement-header">
                         <div class="requirement-title">
@@ -2134,28 +2296,16 @@
                     <div class="requirement-content" onclick="event.stopPropagation()">
                         <div class="missing-list">
                             ${req.items.map(item => `
-                                <div class="${item.pass ? 'pass-item' : 'missing-item'} ${item.type ? 'credit-item-' + item.type : ''}">
+                                <div class="${item.pass ? 'pass-item' : 'missing-item'}">
                                     <i data-lucide="${item.pass ? 'check' : 'x'}" style="width: 14px; margin-top: 3px;"></i>
-                                    <span style="${item.type ? 'font-weight: 700;' : ''}">${item.text} ${item.pass ? '(완료)' : '(미이수/미완료)'}</span>
+                                    <span>${item.text} ${item.pass ? '(완료)' : '(미이수/미완료)'}</span>
                                 </div>
                             `).join('')}
                         </div>
-                        ${req.id === 1 ? `
-                            <div style="margin-top: 1rem; padding: 1rem; background: #f8fafc; border-radius: 8px;">
-                                <strong style="font-size: 0.85rem; display: block; margin-bottom: 0.5rem;">세부 영역 이수 현황</strong>
-                                <div class="grid-list" style="font-size: 0.8rem;">
-                                    ${areaRequirement.items.map(i => `
-                                        <div style="color: ${i.pass ? i.color : 'var(--text-muted)'}; display: flex; align-items: center; gap: 4px; border: 1px solid ${i.pass ? i.color + '44' : '#eee'}; padding: 4px 8px; border-radius: 4px; font-weight: ${i.pass ? '700' : '400'};">
-                                            <i data-lucide="${i.pass ? 'check' : 'circle'}" style="width: 10px;"></i> ${i.text}
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                        ` : ''}
-                        ${req.guide ? `<a href="${req.guide}" target="_blank" class="requirement-guide-btn"><i data-lucide="external-link" style="width: 12px;"></i> 안내 바로가기</a>` : ''}
                     </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
 
             const finalStatus = document.getElementById('final-status');
             if (creditPass && areasPass && extraPass) {
