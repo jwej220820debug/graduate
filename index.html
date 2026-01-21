@@ -1396,7 +1396,17 @@
 
         window.onpopstate = function (event) {
             if (event.state && event.state.step) {
-                goToStep(event.state.step, false);
+                const targetStep = event.state.step;
+                const success = goToStep(targetStep, false);
+
+                // If navigation failed (validation), revert the history change
+                if (!success) {
+                    if (targetStep > state.currentStep) {
+                        history.back();
+                    } else {
+                        history.forward();
+                    }
+                }
             }
         };
 
@@ -1435,9 +1445,9 @@
         }
 
         function goToStep(step, pushHistory = true) {
-            if (state.currentStep === step) return;
+            if (state.currentStep === step) return true;
 
-            // Forward navigation validation
+            // Forward navigation validation (Always validate Step 1 fields when leaving Step 1)
             if (step > 1 && state.currentStep === 1) {
                 const sid = document.getElementById('student-id').value;
                 const name = document.getElementById('student-name').value;
@@ -1445,10 +1455,10 @@
 
                 if (!/^202[3-6]\d{5}$/.test(sid)) {
                     alert('올바른 학번 형식을 입력하세요 (2023~2026학번)');
-                    return;
+                    return false;
                 }
-                if (!name) { alert('이름을 입력하세요'); return; }
-                if (!track) { alert('과정을 선택하세요'); return; }
+                if (!name) { alert('이름을 입력하세요'); return false; }
+                if (!track) { alert('과정을 선택하세요'); return false; }
 
                 state.studentId = sid;
                 state.name = name;
@@ -1481,11 +1491,16 @@
 
             // Manage 'done' markers
             if (state.currentStep < step) {
-                document.getElementById(`step-cont-${state.currentStep}`).classList.add('done');
+                // If moving forward, mark previous steps as done
+                for (let i = state.currentStep; i < step; i++) {
+                    const el = document.getElementById(`step-cont-${i}`);
+                    if (el) el.classList.add('done');
+                }
             } else {
                 // If going back, remove 'done' from the target step and subsequent steps
                 for (let i = step; i <= 3; i++) {
-                    document.getElementById(`step-cont-${i}`).classList.remove('done');
+                    const el = document.getElementById(`step-cont-${i}`);
+                    if (el) el.classList.remove('done');
                 }
             }
 
@@ -1493,6 +1508,7 @@
             document.getElementById(`step-${step}`).classList.remove('hidden');
             document.getElementById(`step-cont-${step}`).classList.add('active');
             window.scrollTo(0, 0);
+            return true;
         }
 
         function initStep2() {
