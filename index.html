@@ -1443,6 +1443,7 @@
                 document.querySelectorAll('.step-container').forEach((el, idx) => {
                     if (idx > 0) el.classList.remove('done');
                 });
+                state.lastInitializedTrack = null; // Force Step 2 re-init if category changes
             }
         }
 
@@ -1553,6 +1554,16 @@
 
         function initStep2() {
             const trackInfo = CONFIG.tracks[state.track];
+
+            // Optimization: If track hasn't changed and UI is already built, skip re-initialization
+            const container = document.getElementById('semesters-container');
+            if (state.lastInitializedTrack === state.track && container.children.length > 0) {
+                console.log('Track unchanged, skipping full re-init');
+                updateSemesterCredits();
+                return;
+            }
+
+            state.lastInitializedTrack = state.track;
             state.extraSemesters = 0; // Reset extra semesters
 
             // Clear all checkboxes in Step 2 to prevent state bleed
@@ -1576,7 +1587,6 @@
 
             // Semesters
             const semCount = trackInfo.semesters;
-            const container = document.getElementById('semesters-container');
             container.innerHTML = '';
             for (let i = 1; i <= semCount; i++) {
                 addSemesterUI(i, container);
