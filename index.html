@@ -915,15 +915,15 @@
         </header>
 
         <div class="steps">
-            <div class="step-container active" id="step-cont-1">
+            <div class="step-container active" id="step-cont-1" onclick="goToStep(1)" style="cursor: pointer;">
                 <div class="step" id="step-dot-1"><span>1</span></div>
                 <div class="step-label">정보 입력</div>
             </div>
-            <div class="step-container" id="step-cont-2">
+            <div class="step-container" id="step-cont-2" onclick="goToStep(2)" style="cursor: pointer;">
                 <div class="step" id="step-dot-2"><span>2</span></div>
                 <div class="step-label">이수 현황</div>
             </div>
-            <div class="step-container" id="step-cont-3">
+            <div class="step-container" id="step-cont-3" onclick="goToStep(3)" style="cursor: pointer;">
                 <div class="step" id="step-dot-3"><span>3</span></div>
                 <div class="step-label">사정 결과</div>
             </div>
@@ -1306,6 +1306,17 @@
             extraSemesters: 0
         };
 
+        // Initialize History
+        if (!history.state) {
+            history.replaceState({ step: 1 }, null, "");
+        }
+
+        window.onpopstate = function (event) {
+            if (event.state && event.state.step) {
+                goToStep(event.state.step, false);
+            }
+        };
+
         function showSubTracks(group) {
             // Reset category buttons
             document.querySelectorAll('.category-btn').forEach(btn => {
@@ -1340,8 +1351,11 @@
             document.getElementById('selected-track').value = trackId;
         }
 
-        function goToStep(step) {
-            if (step === 2) {
+        function goToStep(step, pushHistory = true) {
+            if (state.currentStep === step) return;
+
+            // Forward navigation validation
+            if (step > 1 && state.currentStep === 1) {
                 const sid = document.getElementById('student-id').value;
                 const name = document.getElementById('student-name').value;
                 const track = state.track;
@@ -1355,19 +1369,42 @@
 
                 state.studentId = sid;
                 state.name = name;
+            }
 
+            // Step specific initializations
+            if (step === 2) {
                 initStep2();
                 loadData();
             }
-
             if (step === 3) {
+                // If coming straight from 1, might need initStep2/loadData if skipped? 
+                // But normally users go 1->2->3. 
+                // If they jump 1->3, state validation above handles basic info.
+                if (!document.getElementById('semesters-container').children.length) {
+                    initStep2();
+                    loadData();
+                }
                 saveData();
                 calculateResult();
             }
 
+            if (pushHistory) {
+                history.pushState({ step: step }, null, "");
+            }
+
+            // UI Update
             document.getElementById(`step-${state.currentStep}`).classList.add('hidden');
             document.getElementById(`step-cont-${state.currentStep}`).classList.remove('active');
-            if (state.currentStep < step) document.getElementById(`step-cont-${state.currentStep}`).classList.add('done');
+
+            // Manage 'done' markers
+            if (state.currentStep < step) {
+                document.getElementById(`step-cont-${state.currentStep}`).classList.add('done');
+            } else {
+                // If going back, remove 'done' from the target step and subsequent steps
+                for (let i = step; i <= 3; i++) {
+                    document.getElementById(`step-cont-${i}`).classList.remove('done');
+                }
+            }
 
             state.currentStep = step;
             document.getElementById(`step-${step}`).classList.remove('hidden');
