@@ -499,12 +499,15 @@
             user-select: none;
         }
 
-        .checkbox-container input {
-            position: absolute;
-            opacity: 0;
-            cursor: pointer;
-            height: 0;
-            width: 0;
+        .checkbox-container.disabled-excluded {
+            text-decoration: line-through;
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .checkbox-container.disabled-excluded input {
+            pointer-events: none;
         }
 
         .checkmark {
@@ -1240,10 +1243,11 @@
                 </div>
                 <div class="grid-list">
                     <label class="checkbox-container">성인지교육 1차 이수
-                        <input type="checkbox" id="check-gender1"><span class="checkmark"></span>
+                        <input type="checkbox" id="check-gender1" onchange="saveData()"><span class="checkmark"></span>
                     </label>
                     <label class="checkbox-container">성인지교육 2차 이수
-                        <input type="checkbox" id="check-gender2"><span class="checkmark"></span>
+                        <input type="checkbox" id="check-gender2"
+                            onchange="handleSequentialCheck(this, 'check-gender1')"><span class="checkmark"></span>
                     </label>
                 </div>
             </div>
@@ -1337,20 +1341,24 @@
                     </a>
                 </div>
                 <div class="grid-list">
-                    <label class="checkbox-container">교육봉사 해당 없음
-                        <input type="checkbox" id="check-edu-service-na" onchange="saveData()"><span
+                    <label class="checkbox-container" id="lbl-edu-service-na">교육봉사 해당 없음
+                        <input type="checkbox" id="check-edu-service-na"
+                            onchange="handleExclusion(this, 'check-edu-service-60', 'lbl-edu-service-60')"><span
                             class="checkmark"></span>
                     </label>
-                    <label class="checkbox-container">교육실습 해당 없음 (면제 서류 제출)
-                        <input type="checkbox" id="check-teaching-practice-na" onchange="saveData()"><span
+                    <label class="checkbox-container" id="lbl-teaching-practice-na">교육실습 해당 없음 (면제 서류 제출)
+                        <input type="checkbox" id="check-teaching-practice-na"
+                            onchange="handleExclusion(this, 'check-teaching-practice-1', 'lbl-teaching-practice-1')"><span
                             class="checkmark"></span>
                     </label>
-                    <label class="checkbox-container">교육봉사 60시간 완료
-                        <input type="checkbox" id="check-edu-service-60" onchange="saveData()"><span
+                    <label class="checkbox-container" id="lbl-edu-service-60">교육봉사 60시간 완료
+                        <input type="checkbox" id="check-edu-service-60"
+                            onchange="handleExclusion(this, 'check-edu-service-na', 'lbl-edu-service-na')"><span
                             class="checkmark"></span>
                     </label>
-                    <label class="checkbox-container">교육실습 1회 완료
-                        <input type="checkbox" id="check-teaching-practice-1" onchange="saveData()"><span
+                    <label class="checkbox-container" id="lbl-teaching-practice-1">교육실습 1회 완료
+                        <input type="checkbox" id="check-teaching-practice-1"
+                            onchange="handleExclusion(this, 'check-teaching-practice-na', 'lbl-teaching-practice-na')"><span
                             class="checkmark"></span>
                     </label>
                 </div>
@@ -2700,13 +2708,40 @@
         }
 
         function handlePaperStepChange(el) {
-            if (el.checked) {
-                const stepId = parseInt(el.getAttribute('data-step-id'));
-                // Check all previous steps
-                for (let i = 1; i <= stepId; i++) {
+            const stepId = parseInt(el.getAttribute('data-step-id'));
+            const isChecked = el.checked;
+            const maxStep = document.querySelectorAll('.paper-step-check').length;
+
+            if (isChecked) {
+                // Check all PREVIOUS steps
+                for (let i = 1; i < stepId; i++) {
                     const step = document.getElementById(`paper-step${i}`);
                     if (step) step.checked = true;
                 }
+            } else {
+                // Uncheck all SUBSEQUENT steps
+                for (let i = stepId + 1; i <= 20; i++) { // Max usually 12
+                    const step = document.getElementById(`paper-step${i}`);
+                    if (step) step.checked = false;
+                    else break;
+                }
+            }
+            saveData();
+        }
+
+        function handleExclusion(el, targetId, targetLabelId) {
+            const target = document.getElementById(targetId);
+            const targetLabel = document.getElementById(targetLabelId);
+
+            if (el.checked) {
+                if (target) {
+                    target.checked = false;
+                    target.disabled = true;
+                }
+                if (targetLabel) targetLabel.classList.add('disabled-excluded');
+            } else {
+                if (target) target.disabled = false;
+                if (targetLabel) targetLabel.classList.remove('disabled-excluded');
             }
             saveData();
         }
