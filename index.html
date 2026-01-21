@@ -937,10 +937,18 @@
                             </div>
                         </div>
                     </div>
+                    <div class="radio-box" onclick="selectTrack('yangseong_thesis_30')">
+                        <i data-lucide="graduation-cap"></i>
+                        <div>
+                            <strong>양성 과정 (학위논문) - 30학점</strong>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">30학점(전공 24, 교직 6), 5학기, 논문 제출
+                            </div>
+                        </div>
+                    </div>
                     <div class="radio-box" onclick="selectTrack('yangseong_thesis')">
                         <i data-lucide="graduation-cap"></i>
                         <div>
-                            <strong>양성 과정 (학위논문)</strong>
+                            <strong>양성 과정 (학위논문) - 24학점</strong>
                             <div style="font-size: 0.85rem; color: var(--text-muted);">24학점(전공 20, 교직 4), 4학기, 논문 제출
                             </div>
                         </div>
@@ -1151,7 +1159,8 @@
         const CONFIG = {
             tracks: {
                 yangseong_report: { name: '양성 과정 (무논문 연구보고서)', total: 30, major: 24, edu: 6, semesters: 5, type: 'report' },
-                yangseong_thesis: { name: '양성 과정 (학위논문)', total: 24, major: 20, edu: 4, semesters: 4, type: 'thesis' },
+                yangseong_thesis_30: { name: '양성 과정 (학위논문) - 30학점', total: 30, major: 24, edu: 6, semesters: 5, type: 'thesis' },
+                yangseong_thesis: { name: '양성 과정 (학위논문) - 24학점', total: 24, major: 20, edu: 4, semesters: 4, type: 'thesis' },
                 minor_report: { name: '부전공 과정 (무논문 연구보고서)', total: 30, major: 30, edu: 0, semesters: 5, type: 'report' }
             },
             areas: [
