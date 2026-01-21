@@ -582,32 +582,93 @@
             position: absolute;
             top: 100%;
             left: 0;
-            right: 0;
             background: white;
             border: 1px solid var(--border);
-            border-radius: 8px;
-            max-height: 300px;
+            border-radius: 12px;
+            max-height: 500px;
             overflow-y: auto;
             z-index: 1000;
-            box-shadow: var(--shadow);
-            margin-top: 4px;
+            box-shadow: var(--shadow-lg);
+            margin-top: 8px;
+            width: 800px;
+            /* 4 columns */
+            padding: 15px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        /* Adjust position if near right edge */
+        .dropdown-list.align-right {
+            left: auto;
+            right: 0;
+        }
+
+        .dropdown-column {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .column-header {
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            padding: 4px 8px;
+            margin-bottom: 8px;
+            border-bottom: 2px solid var(--primary-light);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            position: sticky;
+            top: -15px;
+            background: white;
+            z-index: 11;
         }
 
         .dropdown-item {
-            padding: 10px 15px;
+            padding: 8px 10px;
             cursor: pointer;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #f8fafc;
+            flex-direction: column;
+            border-radius: 8px;
+            transition: all 0.2s;
+            border: 1px solid transparent;
         }
 
-        .dropdown-item:hover {
+        .dropdown-item:hover:not(.disabled) {
             background-color: var(--primary-light);
+            border-color: var(--primary);
+            transform: translateX(4px);
         }
 
-        .dropdown-item:last-child {
-            border-bottom: none;
+        .dropdown-item.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: #f8fafc;
+        }
+
+        .dropdown-item .subject-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .dropdown-item .subject-meta {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 850px) {
+            .dropdown-list {
+                width: 400px;
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 450px) {
+            .dropdown-list {
+                width: 280px;
+                grid-template-columns: 1fr;
+            }
         }
 
         .subject-name {
@@ -1890,6 +1951,24 @@
             list = document.createElement('div');
             list.className = 'dropdown-list';
 
+            // Adjust positioning if too close to right edge
+            const rect = input.getBoundingClientRect();
+            if (rect.left + 800 > window.innerWidth) {
+                list.classList.add('align-right');
+            }
+
+            // Group subjects
+            const groups = {
+                basic: { title: '기본이수', items: [] },
+                essential: { title: '교과교육', items: [] },
+                major: { title: '일반전공', items: [] },
+                edu: { title: '교직과목', items: [] }
+            };
+
+            subjects.forEach(s => {
+                if (groups[s.cls]) groups[s.cls].items.push(s);
+            });
+
             // Get currently selected subjects to mark duplicates
             const selectedSubjects = new Set(
                 Array.from(document.querySelectorAll('.course-input'))
@@ -1897,35 +1976,49 @@
                     .filter(v => v !== '' && v !== input.value.trim())
             );
 
-            if (subjects.length === 0) {
-                list.innerHTML = '<div class="dropdown-item" style="color: var(--text-muted);">검색 결과 없음</div>';
-            } else {
-                subjects.forEach(s => {
+            const categories = ['basic', 'essential', 'major', 'edu'];
+            let hasResults = false;
+
+            categories.forEach(catId => {
+                const group = groups[catId];
+                if (group.items.length > 0) hasResults = true;
+
+                const col = document.createElement('div');
+                col.className = 'dropdown-column';
+                col.innerHTML = `<div class="column-header">${group.title}</div>`;
+
+                group.items.forEach(s => {
                     const isDuplicate = selectedSubjects.has(s.name);
                     const item = document.createElement('div');
                     item.className = 'dropdown-item' + (isDuplicate ? ' disabled' : '');
                     item.innerHTML = `
-                        <div style="display: flex; flex-direction: column;">
-                            <span class="subject-name color-${s.cls}">${s.name}</span>
-                            <span style="font-size: 0.7rem; color: var(--text-muted);">(2학점)</span>
-                        </div>
-                        <span class="category-badge bg-${s.cls}">${s.cat}</span>
+                        <span class="subject-name color-${s.cls}">${s.name}</span>
+                        <span class="subject-meta">2학점</span>
                     `;
 
                     if (!isDuplicate) {
-                        item.onclick = () => {
+                        item.onclick = (e) => {
+                            e.stopPropagation();
                             input.value = s.name;
-                            saveData();
-                            updateSemesterCredits();
-                            list.remove();
+                            input.dispatchEvent(new Event('change'));
+                            hideAllDropdowns();
                         };
                     } else {
-                        item.title = "이미 다른 슬롯에 선택된 과목입니다.";
+                        item.title = "이미 선택된 과목입니다.";
                     }
-                    list.appendChild(item);
+                    col.appendChild(item);
                 });
+                list.appendChild(col);
+            });
+
+            if (!hasResults) {
+                list.style.display = 'block';
+                list.style.width = '200px';
+                list.innerHTML = '<div style="padding:10px; text-align:center; color:var(--text-muted);">검색 결과 없음</div>';
             }
+
             container.appendChild(list);
+            lucide.createIcons();
         }
 
         function hideAllDropdowns() {
