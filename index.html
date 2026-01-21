@@ -1758,8 +1758,12 @@
                         if (isRetraining) section.classList.add('hidden');
                         else section.classList.remove('hidden');
                     } else if (idx === 3) { // Education Practice
-                        if (!isYangseong) section.classList.add('hidden');
-                        else section.classList.remove('hidden');
+                        // Education Practice is required for both Yangseong and Minor tracks
+                        if (state.track.startsWith('yangseong') || state.track.startsWith('minor')) {
+                            section.classList.remove('hidden');
+                        } else {
+                            section.classList.add('hidden');
+                        }
                     }
                 }
             });
@@ -2398,15 +2402,20 @@
 
             // Re-filter and re-number for the final dashboard view
             const isYangseongResult = state.track.startsWith('yangseong');
+            const isMinorResult = state.track.startsWith('minor');
+
             const finalRequirements = requirements.filter(r => {
                 if (isRetraining) {
                     // Hide 2(Gender), 4(CPR), 5(Aptitude) for retraining
                     if (r.id === 2 || r.id === 4 || r.id === 5) return false;
                 }
-                if (!isYangseongResult) {
-                    // Hide 7(Education Practice) for non-Yangseong
-                    if (r.id === 7) return false;
+
+                // Education Practice (Req 7) is for Yangseong and Minor tracks
+                if (r.id === 7) {
+                    if (isYangseongResult || isMinorResult) return true;
+                    return false;
                 }
+
                 return true;
             }).map((r, idx) => {
                 const newId = idx + 1;
