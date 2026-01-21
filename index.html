@@ -1596,7 +1596,7 @@
             // Renumber requirements
             let reqNumber = 1;
             const allReqHeaders = [
-                { id: 'req-h1', text: '수업 및 학점', icon: 'book-open', guide: '042-821-5691', link: 'https://techedu.cnu.ac.kr/techedu/edu/notice.do?mode=view&articleNo=289290&article.offset=0&articleLimit=10&srSearchVal=%ED%95%99%EC%82%AC%EC%A7%80%EB%8F%84' },
+                { id: 'req-h1', text: '수업 및 학점', icon: 'book-open', phones: [{ text: '기술교육과', num: '042-821-5691' }, { text: '교육대학원', num: '042-821-5252' }], link: 'https://techedu.cnu.ac.kr/techedu/edu/notice.do?mode=view&articleNo=289290&article.offset=0&articleLimit=10&srSearchVal=%ED%95%99%EC%82%AC%EC%A7%80%EB%8F%84' },
                 { id: 'req-h2', text: '성인지교육', icon: 'users', sectionId: 'check-gender1' },
                 { id: 'req-h3', text: '연구윤리', icon: 'shield-check' },
                 { id: 'req-h4', text: '심폐소생술', icon: 'heart-pulse', sectionId: 'check-cpr1' },
@@ -1620,6 +1620,11 @@
                     let guideHtml = '';
                     if (h.link) {
                         guideHtml += `<a href="${h.link}" target="_blank" class="guide-link" style="margin-left:auto; font-size:0.75rem;"><i data-lucide="external-link" style="width:12px;height:12px;"></i> 안내</a>`;
+                    }
+                    if (h.phones) {
+                        h.phones.forEach((p, idx) => {
+                            guideHtml += `<a href="tel:${p.num}" class="guide-link" style="margin-left:${(idx === 0 && !h.link) ? 'auto' : '8px'}; font-size:0.75rem;"><i data-lucide="phone" style="width:12px;height:12px;"></i> ${p.text}: ${p.num}</a>`;
+                        });
                     }
                     if (h.guide) {
                         guideHtml += `<a href="tel:${h.guide}" class="guide-link" style="margin-left:${h.link ? '8px' : 'auto'}; font-size:0.75rem;"><i data-lucide="phone" style="width:12px;height:12px;"></i> 문의: ${h.guide}</a>`;
@@ -2086,7 +2091,7 @@
                     title: `졸업요건1. 수업 및 학점 ${creditDist}`,
                     pass: req1Pass,
                     guide: links.credits,
-                    phone: "042-821-5691",
+                    phones: [{ text: '기술교육과', num: '042-821-5691' }, { text: '교육대학원', num: '042-821-5252' }],
                     items: [
                         { text: `전체 ${trackInfo.total}학점 중 ${totalCredits}학점 이수`, pass: totalCredits >= trackInfo.total, type: 'total' },
                         { text: `전공(일반/기본) ${trackInfo.major}학점 중 ${totalMajor}학점 이수`, pass: totalMajor >= trackInfo.major, type: 'major' },
@@ -2212,7 +2217,7 @@
                                     <span>${req.title}</span>
                                     <div style="display: flex; gap: 8px;">
                                         ${req.guide ? `<a href="${req.guide}" target="_blank" class="guide-link" style="margin-left:0; font-size: 0.75rem;"><i data-lucide="external-link" style="width:12px;height:12px;"></i> 안내</a>` : ''}
-                                        ${req.phone ? `<a href="tel:${req.phone}" class="guide-link" style="margin-left:0; font-size: 0.75rem;"><i data-lucide="phone" style="width:12px;height:12px;"></i> 문의: ${req.phone}</a>` : ''}
+                                        ${req.phones ? req.phones.map(p => `<a href="tel:${p.num}" class="guide-link" style="margin-left:0; font-size: 0.75rem;"><i data-lucide="phone" style="width:12px;height:12px;"></i> ${p.text}: ${p.num}</a>`).join('') : ''}
                                     </div>
                                 </div>
                             </div>
@@ -2253,12 +2258,16 @@
                             <div style="margin-bottom: 1.5rem;">
                                 <strong style="font-size: 0.85rem; display: block; margin-bottom: 0.75rem; color: var(--text-main);">기본이수 및 교과교육 영역 현황</strong>
                                 <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px;">
-                                    ${areaRequirement.items.map(i => `
-                                        <div class="area-status-tile ${i.pass ? 'pass' : 'fail'}">
+                                    ${areaRequirement.items.map(i => {
+                        const isBasic = i.text.includes('기본이수');
+                        const color = isBasic ? '#059669' : '#2563eb';
+                        return `
+                                        <div class="area-status-tile ${i.pass ? 'pass' : 'fail'}" style="${i.pass ? `color: ${color}; border-color: ${color}44;` : ''}">
                                             <i data-lucide="${i.pass ? 'check-circle' : 'circle'}" style="width: 14px;"></i>
-                                            ${i.text.replace(/기본이수 |교과교육 /, '')}
+                                            <span style="color: ${color}; font-weight: 800; margin-right: 4px;">${isBasic ? '기본' : '교과'}</span>
+                                            ${i.text.replace(/기본이수 \[|\]|교과교육 \[/g, '')}
                                         </div>
-                                    `).join('')}
+                                    `}).join('')}
                                 </div>
                             </div>
                             ` : ''}
@@ -2269,6 +2278,27 @@
                                 <span>중복 선택된 과목이 존재합니다. 동일 과목은 중복 인정되지 않습니다.</span>
                             </div>
                             ` : ''}
+
+                            <div style="margin-top: 1.5rem; border-top: 1px solid #f1f5f9; padding-top: 1rem;">
+                                <button class="btn btn-secondary" style="width: 100%; justify-content: space-between; font-size: 0.85rem;" onclick="this.nextElementSibling.classList.toggle('hidden')">
+                                    <span>이수 과목 상세 내역 (전공/기본이수/교과교육)</span>
+                                    <i data-lucide="chevron-down"></i>
+                                </button>
+                                <div class="hidden" style="margin-top: 1rem; padding: 1rem; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;">
+                                    <div style="margin-bottom: 1rem;">
+                                        <h4 style="font-size: 0.85rem; margin-bottom: 0.5rem; color: #059669;">✅ 이수 완료 공통/전공 과목</h4>
+                                        <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                                            ${Array.from(uniqueCourses).map(c => `<span style="font-size: 0.75rem; background: white; padding: 4px 8px; border-radius: 6px; border: 1px solid #dcfce7; color: #166534;">${c}</span>`).join('')}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4 style="font-size: 0.85rem; margin-bottom: 0.5rem; color: #b91c1c;">⚠️ 미충족 필수 영역 (기본이수/교과교육)</h4>
+                                        <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                                            ${areaRequirement.items.filter(i => !i.pass).map(i => `<span style="font-size: 0.75rem; background: #fef2f2; padding: 4px 8px; border-radius: 6px; border: 1px solid #fee2e2; color: #991b1b;">${i.text}</span>`).join('')}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>`;
                 }
@@ -2284,7 +2314,7 @@
                                 <span>${req.title}</span>
                                 <div style="display: flex; gap: 8px;">
                                     ${req.guide ? `<a href="${req.guide}" target="_blank" class="guide-link" style="margin-left:0; font-size: 0.75rem;"><i data-lucide="external-link" style="width:12px;height:12px;"></i> 안내</a>` : ''}
-                                    ${req.phone ? `<a href="tel:${req.phone}" class="guide-link" style="margin-left:0; font-size: 0.75rem;"><i data-lucide="phone" style="width:12px;height:12px;"></i> 문의: ${req.phone}</a>` : ''}
+                                    ${req.phones ? req.phones.map(p => `<a href="tel:${p.num}" class="guide-link" style="margin-left:0; font-size: 0.75rem;"><i data-lucide="phone" style="width:12px;height:12px;"></i> ${p.text}: ${p.num}</a>`).join('') : ''}
                                 </div>
                             </div>
                         </div>
