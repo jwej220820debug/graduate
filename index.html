@@ -1614,6 +1614,7 @@
             if (state.track !== trackId) {
                 state.track = trackId;
                 state.maxReachedStep = 1; // Reset progress when specific track changes
+                state.lastInitializedTrack = null; // Force Step 2 re-init when track changes
                 document.querySelectorAll('.step-container').forEach((el, idx) => {
                     if (idx > 0) el.classList.remove('done');
                 });
