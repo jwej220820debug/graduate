@@ -1628,40 +1628,48 @@
         function goToStep(step, pushHistory = true) {
             if (state.currentStep === step) return true;
 
-            // Gating: Can only go to a step if it's been reached before, it's the next sequential step, or we've reached step 3
-            const canJump = state.maxReachedStep >= 3;
-            if (step > state.maxReachedStep + 1 && !canJump) {
-                return false;
-            }
+            const isMovingForward = step > state.currentStep;
 
-            // Validation: Moving from 1 to forward
-            if (step > 1 && state.currentStep === 1) {
-                const sidInput = document.getElementById('student-id');
-                const nameInput = document.getElementById('student-name');
-                const sid = sidInput.value.trim();
-                const name = nameInput.value.trim();
-                const track = state.track;
-
-                if (!/^202[3-6]\d{5}$/.test(sid)) {
-                    alert('올바른 학번 형식을 입력하세요 (2023~2026학번)');
+            // Gating: Only block if trying to skip steps forward without reaching step 3
+            if (isMovingForward && state.maxReachedStep < 3) {
+                if (step > state.maxReachedStep + 1) {
                     return false;
                 }
-                if (!name) { alert('이름을 입력하세요'); return false; }
-                if (!track) { alert('과정을 선택하세요'); return false; }
-
-                // If user identity changed, reset session progress
-                if (state.studentId && (state.studentId !== sid || state.name !== name)) {
-                    state.maxReachedStep = 1;
-                    document.querySelectorAll('.step-container').forEach((el, idx) => {
-                        if (idx > 0) el.classList.remove('done');
-                    });
-                }
-
-                state.studentId = sid;
-                state.name = name;
             }
 
-            // Validation: Moving to Step 3 (First time or if courses cleared)
+            // Validation: Moving forward from Step 1
+            if (isMovingForward && state.currentStep === 1) {
+                try {
+                    const sidInput = document.getElementById('student-id');
+                    const nameInput = document.getElementById('student-name');
+                    const sid = sidInput.value.trim();
+                    const name = nameInput.value.trim();
+                    const track = state.track || document.getElementById('selected-track')?.value;
+
+                    if (!/^202[3-6]\d{5}$/.test(sid)) {
+                        alert('올바른 학번 형식을 입력하세요 (2023~2026학번)');
+                        return false;
+                    }
+                    if (!name) { alert('이름을 입력하세요'); return false; }
+                    if (!track) { alert('과정을 선택하세요'); return false; }
+
+                    // If user identity changed, reset session progress
+                    if (state.studentId && (state.studentId !== sid || state.name !== name)) {
+                        state.maxReachedStep = 1;
+                        document.querySelectorAll('.step-container').forEach((el, idx) => {
+                            if (idx > 0) el.classList.remove('done');
+                        });
+                    }
+
+                    state.studentId = sid;
+                    state.name = name;
+                    state.track = track;
+                } catch (e) {
+                    console.error("Step 1 validation error:", e);
+                }
+            }
+
+            // Validation: Moving to Step 3 (First time)
             if (step === 3 && state.maxReachedStep < 3) {
                 const courses = Array.from(document.querySelectorAll('.course-input')).map(sel => sel.value).filter(v => v);
                 if (courses.length === 0) {
@@ -1670,56 +1678,28 @@
                 }
             }
 
-            // Step specific initializations
-            if (step === 1) {
-                initStep1();
-            }
-            if (step === 2) {
-                initStep2();
-                loadData();
-            }
-            if (step === 3) {
-                if (!document.getElementById('semesters-container').children.length) {
-                    initStep2();
-                    loadData();
-                }
-                saveData();
-                calculateResult();
-            }
-
             // Update max reached step
             if (step > state.maxReachedStep) {
                 state.maxReachedStep = step;
             }
 
-            if (pushHistory) {
-                history.pushState({ step: step }, null, "");
-            }
+            // UI Update: Hide current
+            const currentCard = document.getElementById(`step-${state.currentStep}`);
+            const currentTab = document.getElementById(`step-cont-${state.currentStep}`);
+            if (currentCard) currentCard.classList.add('hidden');
+            if (currentTab) currentTab.classList.remove('active');
 
-            // UI Update
-            document.getElementById(`step-${state.currentStep}`).classList.add('hidden');
-            document.getElementById(`step-cont-${state.currentStep}`).classList.remove('active');
-
-            // Manage 'done' markers
+            // Manage 'done' markers in header
             if (state.maxReachedStep >= 3) {
-                // If we've reached step 3, keep previous steps as done
                 for (let i = 1; i <= 3; i++) {
                     const el = document.getElementById(`step-cont-${i}`);
                     if (!el) continue;
-                    if (i < step) {
-                        el.classList.add('done');
-                        el.classList.remove('active');
-                    } else if (i === step) {
-                        el.classList.remove('done');
-                        el.classList.add('active');
-                    } else {
-                        // For steps > current, they can be done or not. 
-                        // Usually in freedom mode, we show them as reachable.
-                        el.classList.remove('active');
-                    }
+                    if (i < step) { el.classList.add('done'); el.classList.remove('active'); }
+                    else if (i === step) { el.classList.remove('done'); el.classList.add('active'); }
+                    else { el.classList.remove('active'); }
                 }
             } else {
-                if (state.currentStep < step) {
+                if (isMovingForward) {
                     for (let i = state.currentStep; i < step; i++) {
                         const el = document.getElementById(`step-cont-${i}`);
                         if (el) el.classList.add('done');
@@ -1732,9 +1712,33 @@
                 }
             }
 
+            // Update State
             state.currentStep = step;
-            document.getElementById(`step-${step}`).classList.remove('hidden');
-            document.getElementById(`step-cont-${step}`).classList.add('active');
+
+            // Step specific initializations
+            try {
+                if (step === 1) initStep1();
+                if (step === 2) { initStep2(); loadData(); }
+                if (step === 3) {
+                    if (!document.getElementById('semesters-container').children.length) {
+                        initStep2(); loadData();
+                    }
+                    saveData(); calculateResult();
+                }
+            } catch (e) {
+                console.error("Initialization error for step", step, e);
+            }
+
+            // UI Update: Show new
+            const nextCard = document.getElementById(`step-${step}`);
+            const nextTab = document.getElementById(`step-cont-${step}`);
+            if (nextCard) nextCard.classList.remove('hidden');
+            if (nextTab) nextTab.classList.add('active');
+
+            if (pushHistory) {
+                history.pushState({ step: step }, null, "");
+            }
+
             window.scrollTo(0, 0);
             lucide.createIcons();
             return true;
