@@ -1140,7 +1140,7 @@
             <div class="form-group">
                 <label for="student-id">학번</label>
                 <input type="text" id="student-id" placeholder="예: 202412345" maxlength="9">
-                <small id="id-hint" style="color: var(--text-muted); display: block; margin-top: 5px;">2023~2026학번 형식을
+                <small id="id-hint" style="color: var(--text-muted); display: block; margin-top: 5px;">2023~2030학번 형식을
                     입력하세요.</small>
             </div>
             <div class="form-group">
@@ -1646,8 +1646,8 @@
                     const name = nameInput.value.trim();
                     const track = state.track || document.getElementById('selected-track')?.value;
 
-                    if (!/^202[3-6]\d{5}$/.test(sid)) {
-                        alert('올바른 학번 형식을 입력하세요 (2023~2026학번)');
+                    if (!/^20(2[3-9]|30)\d{5}$/.test(sid)) {
+                        alert('올바른 학번 형식을 입력하세요 (2023~2030학번)');
                         return false;
                     }
                     if (!name) { alert('이름을 입력하세요'); return false; }
