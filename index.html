@@ -1628,15 +1628,18 @@
         function goToStep(step, pushHistory = true) {
             if (state.currentStep === step) return true;
 
-            // Gating: Can only go to a step if it's been reached before or it's the next sequential step
-            if (step > state.maxReachedStep + 1) {
+            // Gating: Can only go to a step if it's been reached before, it's the next sequential step, or we've reached step 3
+            const canJump = state.maxReachedStep >= 3;
+            if (step > state.maxReachedStep + 1 && !canJump) {
                 return false;
             }
 
             // Validation: Moving from 1 to forward
             if (step > 1 && state.currentStep === 1) {
-                const sid = document.getElementById('student-id').value;
-                const name = document.getElementById('student-name').value;
+                const sidInput = document.getElementById('student-id');
+                const nameInput = document.getElementById('student-name');
+                const sid = sidInput.value.trim();
+                const name = nameInput.value.trim();
                 const track = state.track;
 
                 if (!/^202[3-6]\d{5}$/.test(sid)) {
@@ -1658,7 +1661,7 @@
                 state.name = name;
             }
 
-            // Validation: Moving to Step 3 (First time)
+            // Validation: Moving to Step 3 (First time or if courses cleared)
             if (step === 3 && state.maxReachedStep < 3) {
                 const courses = Array.from(document.querySelectorAll('.course-input')).map(sel => sel.value).filter(v => v);
                 if (courses.length === 0) {
@@ -1668,6 +1671,9 @@
             }
 
             // Step specific initializations
+            if (step === 1) {
+                initStep1();
+            }
             if (step === 2) {
                 initStep2();
                 loadData();
@@ -1695,17 +1701,34 @@
             document.getElementById(`step-cont-${state.currentStep}`).classList.remove('active');
 
             // Manage 'done' markers
-            if (state.currentStep < step) {
-                // If moving forward, mark previous steps as done
-                for (let i = state.currentStep; i < step; i++) {
+            if (state.maxReachedStep >= 3) {
+                // If we've reached step 3, keep previous steps as done
+                for (let i = 1; i <= 3; i++) {
                     const el = document.getElementById(`step-cont-${i}`);
-                    if (el) el.classList.add('done');
+                    if (!el) continue;
+                    if (i < step) {
+                        el.classList.add('done');
+                        el.classList.remove('active');
+                    } else if (i === step) {
+                        el.classList.remove('done');
+                        el.classList.add('active');
+                    } else {
+                        // For steps > current, they can be done or not. 
+                        // Usually in freedom mode, we show them as reachable.
+                        el.classList.remove('active');
+                    }
                 }
             } else {
-                // If going back, remove 'done' from the target step and subsequent steps
-                for (let i = step; i <= 3; i++) {
-                    const el = document.getElementById(`step-cont-${i}`);
-                    if (el) el.classList.remove('done');
+                if (state.currentStep < step) {
+                    for (let i = state.currentStep; i < step; i++) {
+                        const el = document.getElementById(`step-cont-${i}`);
+                        if (el) el.classList.add('done');
+                    }
+                } else {
+                    for (let i = step; i <= 3; i++) {
+                        const el = document.getElementById(`step-cont-${i}`);
+                        if (el) el.classList.remove('done');
+                    }
                 }
             }
 
@@ -1713,7 +1736,51 @@
             document.getElementById(`step-${step}`).classList.remove('hidden');
             document.getElementById(`step-cont-${step}`).classList.add('active');
             window.scrollTo(0, 0);
+            lucide.createIcons();
             return true;
+        }
+
+        function initStep1() {
+            const sidInput = document.getElementById('student-id');
+            const nameInput = document.getElementById('student-name');
+            if (sidInput && state.studentId) sidInput.value = state.studentId;
+            if (nameInput && state.name) nameInput.value = state.name;
+
+            if (state.track) {
+                let group = '';
+                if (state.track.startsWith('yangseong')) group = 'yangseong';
+                else if (state.track.startsWith('minor')) group = 'minor';
+                else if (state.track.startsWith('retraining')) group = 'retraining';
+
+                if (group) {
+                    // Show corresponding button as primary
+                    document.querySelectorAll('.category-btn').forEach(btn => {
+                        btn.classList.remove('btn-primary');
+                        btn.classList.add('btn-secondary');
+                    });
+                    const catBtn = document.getElementById(`cat-${group}`);
+                    if (catBtn) {
+                        catBtn.classList.remove('btn-secondary');
+                        catBtn.classList.add('btn-primary');
+                    }
+
+                    // Show sub-tracks group
+                    document.querySelectorAll('.track-group').forEach(g => g.classList.add('hidden'));
+                    const groupEl = document.getElementById(`group-${group}`);
+                    if (groupEl) groupEl.classList.remove('hidden');
+
+                    // Visually select radio box
+                    document.querySelectorAll('.radio-box').forEach(box => {
+                        if (box.getAttribute('data-track') === state.track) {
+                            box.classList.add('selected');
+                        } else {
+                            box.classList.remove('selected');
+                        }
+                    });
+                    const selTrackInput = document.getElementById('selected-track');
+                    if (selTrackInput) selTrackInput.value = state.track;
+                }
+            }
         }
 
         function initStep2() {
@@ -2528,9 +2595,17 @@
                     title: `졸업요건8. ${paperLabel}`,
                     pass: paperDone,
                     items: Array.from(document.querySelectorAll('#paper-checklist input')).map((input, idx) => {
-                        const tempLabel = input.parentElement.cloneNode(true);
-                        tempLabel.querySelectorAll('a, input, span').forEach(el => el.remove());
-                        return { text: tempLabel.innerText.trim(), pass: input.checked };
+                        const labelEl = input.parentElement;
+                        const linkEl = labelEl.querySelector('a.guide-link');
+                        const linkHtml = linkEl ? ` <a href="${linkEl.href}" target="_blank" class="guide-link" style="padding: 2px 6px; font-size: 0.7rem; margin-left: 5px;" onclick="event.stopPropagation()">안내</a>` : '';
+
+                        // Extract just the text node content
+                        let text = "";
+                        for (let node of labelEl.childNodes) {
+                            if (node.nodeType === 3) text += node.textContent.trim();
+                        }
+
+                        return { text: text + linkHtml, pass: input.checked };
                     })
                 }
             ];
